@@ -40,4 +40,21 @@ public class UsuarioDB {
     public static boolean logout(String username) {
         return usuariosLogados.remove(username);
     }
+    
+    public static void atualizarUsuario(String tokenAntigo, Usuario novoUsuario) {
+        usuarios.remove(tokenAntigo);
+        usuarios.put(novoUsuario.getUsuario(), novoUsuario);
+
+        if (usuariosLogados.contains(tokenAntigo)) {
+            usuariosLogados.remove(tokenAntigo);
+            usuariosLogados.add(novoUsuario.getUsuario());
+        }
+    }
+    
+    public static void excluirUsuario(String usuario) {
+        usuarios.remove(usuario);
+        usuariosLogados.remove(usuario);
+    }
+
+
 }

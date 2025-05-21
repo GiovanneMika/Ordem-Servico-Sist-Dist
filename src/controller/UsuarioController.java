@@ -15,8 +15,9 @@ public class UsuarioController {
         String nome = (String) entrada.get("nome");
         String usuario = (String) entrada.get("usuario");
         String senha = (String) entrada.get("senha");
+        String perfil = (String) entrada.get("perfil");
 
-        if (nome == null || usuario == null || senha == null ||
+        if (nome == null || usuario == null || senha == null || perfil == null || !Validador.validarPerfil(perfil) ||
                 !Validador.validarNome(nome) || !Validador.validarUsuario(usuario) || !Validador.validarSenha(senha)) {
             resposta.put("status", "erro");
             resposta.put("mensagem", "Os campos recebidos não são válidos");
@@ -24,7 +25,7 @@ public class UsuarioController {
             resposta.put("status", "erro");
             resposta.put("mensagem", "Usuário já cadastrado");
         } else {
-            Usuario novoUsuario = new Usuario(nome, usuario, senha);
+            Usuario novoUsuario = new Usuario(nome, usuario, senha, perfil);
             UsuarioDB.adicionarUsuario(novoUsuario);
             resposta.put("status", "sucesso");
             resposta.put("mensagem", "Cadastro realizado com sucesso");
@@ -103,5 +104,73 @@ public class UsuarioController {
 
         return resposta;
     }
+    
+    public static JSONObject realizarEdicao(JSONObject entrada) {
+        JSONObject resposta = new JSONObject();
+        resposta.put("operacao", "editar_usuario");
+
+        String token = (String) entrada.get("token");
+        String novoUsuario = (String) entrada.get("novo_usuario");
+        String novoNome = (String) entrada.get("novo_nome");
+        String novaSenha = (String) entrada.get("nova_senha");
+
+        // Verifica se o token é válido
+        if (token == null || !UsuarioDB.estaLogado(token)) {
+            resposta.put("status", "erro");
+            resposta.put("mensagem", "Token invalido");
+            return resposta;
+        }
+
+        // Verifica campos obrigatórios
+        if (novoUsuario == null || novoNome == null || novaSenha == null ||
+            !Validador.validarNome(novoNome) ||
+            !Validador.validarUsuario(novoUsuario) ||
+            !Validador.validarSenha(novaSenha)) {
+            resposta.put("status", "erro");
+            resposta.put("mensagem", "Campos inválidos");
+            return resposta;
+        }
+
+        // Se novo usuário já existir com outro nome
+        if (!token.equals(novoUsuario) && UsuarioDB.usuarioExiste(novoUsuario)) {
+            resposta.put("status", "erro");
+            resposta.put("mensagem", "Usuario já cadastrado");
+            return resposta;
+        }
+
+        // Atualiza o usuário
+        Usuario usuarioAntigo = UsuarioDB.getUsuario(token);
+        Usuario novo = new Usuario(novoNome, novoUsuario, novaSenha, usuarioAntigo.getPerfil());
+
+        UsuarioDB.atualizarUsuario(token, novo);
+        resposta.put("status", "sucesso");
+        resposta.put("mensagem", "Dados atualizados com sucesso");
+        resposta.put("token", novoUsuario);  // token é atualizado
+
+        return resposta;
+    }
+    
+    public static JSONObject realizarExclusao(JSONObject entrada) {
+        JSONObject resposta = new JSONObject();
+        resposta.put("operacao", "excluir_usuario");
+
+        String token = (String) entrada.get("token");
+
+        // Verifica se o token é válido
+        if (token == null || !UsuarioDB.estaLogado(token)) {
+            resposta.put("status", "erro");
+            resposta.put("mensagem", "Token invalido");
+            return resposta;
+        }
+
+        // Remove usuário
+        UsuarioDB.excluirUsuario(token);
+        resposta.put("status", "sucesso");
+        resposta.put("mensagem", "Conta excluída com sucesso");
+
+        return resposta;
+    }
+
+
 
 }

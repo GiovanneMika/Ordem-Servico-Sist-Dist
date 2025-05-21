@@ -30,6 +30,8 @@ public class ClienteMain {
                 System.out.println("2 - Login");
                 System.out.println("3 - Logout");
                 System.out.println("4 - Ler meus dados");
+                System.out.println("5 - Editar meus dados");
+                System.out.println("6 - Excluir minha conta");
                 System.out.println("0 - Sair");
                 System.out.print("Escolha: ");
                 String escolha = teclado.readLine();
@@ -109,6 +111,51 @@ public class ClienteMain {
                     String resposta = in.readLine();
                     System.out.println("JSON recebido do servidor: " + resposta);
                 }
+                
+                else if (escolha.equals("5")) {
+                    JSONObject editar = new JSONObject();
+                    editar.put("operacao", "editar_usuario");
+                    editar.put("token", token);
+
+                    System.out.print("Novo nome: ");
+                    editar.put("novo_nome", teclado.readLine());
+
+                    System.out.print("Novo usuário: ");
+                    editar.put("novo_usuario", teclado.readLine());
+
+                    System.out.print("Nova senha: ");
+                    editar.put("nova_senha", teclado.readLine());
+
+                    out.println(editar.toJSONString());
+                    System.out.println("JSON enviado ao servidor: " + editar.toJSONString());
+
+                    String resposta = in.readLine();
+                    System.out.println("JSON recebido do servidor: " + resposta);
+
+                    if (resposta.contains("\"status\":\"sucesso\"")) {
+                        org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+                        JSONObject obj = (JSONObject) parser.parse(resposta);
+                        token = (String) obj.get("token");  // atualiza token
+                    }
+                }
+                
+                else if (escolha.equals("6")) {
+                    JSONObject excluir = new JSONObject();
+                    excluir.put("operacao", "excluir_usuario");
+                    excluir.put("token", token);
+
+                    out.println(excluir.toJSONString());
+                    System.out.println("JSON enviado ao servidor: " + excluir.toJSONString());
+
+                    String resposta = in.readLine();
+                    System.out.println("JSON recebido do servidor: " + resposta);
+
+                    if (resposta.contains("\"status\":\"sucesso\"")) {
+                        token = null;  // remove o token do cliente
+                    }
+                }
+
+
 
 
                 else if (escolha.equals("0")) {

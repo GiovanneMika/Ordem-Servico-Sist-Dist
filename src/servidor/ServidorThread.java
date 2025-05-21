@@ -54,6 +54,19 @@ public class ServidorThread extends Thread {
                         out.println(resposta.toJSONString());
                         System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
                     }
+                    
+                    else if ("editar_usuario".equalsIgnoreCase(operacao)) {
+                        JSONObject resposta = UsuarioController.realizarEdicao(entrada);
+                        out.println(resposta.toJSONString());
+                        System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
+                    }
+                    
+                    else if ("excluir_usuario".equalsIgnoreCase(operacao)) {
+                        JSONObject resposta = UsuarioController.realizarExclusao(entrada);
+                        out.println(resposta.toJSONString());
+                        System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
+                    }
+
 
 
 

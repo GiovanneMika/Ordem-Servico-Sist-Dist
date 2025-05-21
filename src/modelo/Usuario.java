@@ -6,11 +6,11 @@ public class Usuario {
     private String senha;
     private String perfil;
 
-    public Usuario(String nome, String usuario, String senha) {
+    public Usuario(String nome, String usuario, String senha, String perfil) {
         this.nome = nome;
         this.usuario = usuario;
         this.senha = senha;
-        this.perfil = "comum";
+        this.perfil = perfil;
     }
 
     public String getNome() { return nome; }
