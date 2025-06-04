@@ -56,4 +56,11 @@ public class UsuarioDB {
 		usuariosLogados.remove(usuario);
 	}
 
+	public static void adicionarAdminTemporario() {
+		if (!usuarios.containsKey("admin")) {
+			Usuario admin = new Usuario("Administrador", "admin", "123456", "adm");
+			usuarios.put("admin", admin);
+		}
+	}
+
 }

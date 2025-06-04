@@ -45,7 +45,26 @@ public class UsuarioController {
 		if (usuario == null || senha == null || usuario.isBlank() || senha.isBlank()) {
 			resposta.put("status", "erro");
 			resposta.put("mensagem", "Informações incorretas");
-		} else if (!UsuarioDB.usuarioExiste(usuario)) {
+			return resposta;
+		}
+
+		// Login do usuário ADM fixo
+		if (usuario.equals("admin") && senha.equals("123456")) {
+			if (UsuarioDB.estaLogado("admin")) {
+				resposta.put("status", "erro");
+				resposta.put("mensagem", "Usuario já logado");
+				return resposta;
+			}
+			UsuarioDB.adicionarAdminTemporario(); // adiciona admin se ainda não estiver no sistema
+			UsuarioDB.login("admin", "123456");
+			resposta.put("status", "sucesso");
+			resposta.put("token", "admin");
+			resposta.put("perfil", "adm");
+			return resposta;
+		}
+
+		// Login de usuários comuns
+		if (!UsuarioDB.usuarioExiste(usuario)) {
 			resposta.put("status", "erro");
 			resposta.put("mensagem", "Informações incorretas");
 		} else if (UsuarioDB.estaLogado(usuario)) {
@@ -63,6 +82,7 @@ public class UsuarioController {
 
 		return resposta;
 	}
+
 
 	public static JSONObject realizarLogout(JSONObject entrada) {
 		JSONObject resposta = new JSONObject();
