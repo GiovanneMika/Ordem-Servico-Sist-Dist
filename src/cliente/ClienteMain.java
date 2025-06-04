@@ -11,6 +11,7 @@ public class ClienteMain {
 	public static void main(String[] args) {
 		try {
 			String token = null;
+			String perfil = null;
 			BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
 
 			System.out.print("IP do servidor: ");
@@ -26,7 +27,8 @@ public class ClienteMain {
 
 			while (true) {
 				if (token != null) {
-					if(token != "admin") {
+					if (!"adm".equals(perfil)) {
+						System.out.println(perfil);
 					System.out.println("\n===== MENU =====");
 					System.out.println("1 - Logout");
 					System.out.println("2 - Ler meus dados");
@@ -50,6 +52,7 @@ public class ClienteMain {
 						// se logout for sucesso, apaga o token
 						if (resposta.contains("\"status\":\"sucesso\"")) {
 							token = null;
+							perfil = null;
 						}
 					}
 
@@ -105,6 +108,8 @@ public class ClienteMain {
 
 						if (resposta.contains("\"status\":\"sucesso\"")) {
 							token = null; // remove o token do cliente
+							perfil = null;
+
 						}
 					}
 
@@ -120,7 +125,9 @@ public class ClienteMain {
 						System.out.println("\n===== MENU ADMINISTRATIVO =====");
 						System.out.println("1 - Logout");
 						System.out.println("2 - Ler meus dados");
-						System.out.println("3 - Cadastrar novo usuário");
+						System.out.println("3 - Cadastrar novo usuário comum");
+						System.out.println("4 - Listar todos os usuários");
+						System.out.println("5 - Editar usuário comum");
 						System.out.println("0 - Sair");
 						System.out.print("Escolha: ");
 						String escolha = teclado.readLine();
@@ -154,7 +161,7 @@ public class ClienteMain {
 							System.out.println("JSON recebido do servidor: " + resposta);
 						}
 						
-						if (escolha.equals("3")) {
+						else if (escolha.equals("3")) {
 							JSONObject cadastro = new JSONObject();
 							cadastro.put("operacao", "cadastro");
 
@@ -175,6 +182,43 @@ public class ClienteMain {
 							String resposta = in.readLine();
 							System.out.println("JSON recebido do servidor: " + resposta);
 						}
+						
+						else if (escolha.equals("4")) {
+							JSONObject listar = new JSONObject();
+							listar.put("operacao", "listar_usuarios");
+							listar.put("token", token);
+
+							out.println(listar.toJSONString());
+							System.out.println("JSON enviado ao servidor: " + listar.toJSONString());
+
+							String resposta = in.readLine();
+							System.out.println("JSON recebido do servidor: " + resposta);
+						}
+						
+						else if (escolha.equals("5")) {
+							JSONObject editarOutro = new JSONObject();
+							editarOutro.put("operacao", "editar_usuario");
+							editarOutro.put("token", token);
+
+							System.out.print("Usuário a ser editado: ");
+							editarOutro.put("usuario_alvo", teclado.readLine());
+
+							System.out.print("Novo nome: ");
+							editarOutro.put("novo_nome", teclado.readLine());
+
+							System.out.print("Nova senha: ");
+							editarOutro.put("nova_senha", teclado.readLine());
+
+							System.out.print("Novo perfil (comum/adm): ");
+							editarOutro.put("novo_perfil", teclado.readLine());
+
+							out.println(editarOutro.toJSONString());
+							System.out.println("JSON enviado ao servidor: " + editarOutro.toJSONString());
+
+							String resposta = in.readLine();
+							System.out.println("JSON recebido do servidor: " + resposta);
+						}
+
 						
 						else if (escolha.equals("0")) {
 							System.out.println("Encerrando cliente...");
@@ -236,6 +280,7 @@ public class ClienteMain {
 							org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
 							JSONObject obj = (JSONObject) parser.parse(resposta);
 							token = (String) obj.get("token");
+							perfil = (String) obj.get("perfil"); // <-- pegar o perfil
 						}
 
 					}

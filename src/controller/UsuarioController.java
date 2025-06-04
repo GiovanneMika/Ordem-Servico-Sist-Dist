@@ -3,6 +3,8 @@ package controller;
 
 import banco.UsuarioDB;
 import modelo.Usuario;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import utils.Validador;
 
@@ -189,5 +191,96 @@ public class UsuarioController {
 
 		return resposta;
 	}
+	
+	public static JSONObject realizarListagemDeUsuarios(JSONObject entrada) {
+	    JSONObject resposta = new JSONObject();
+	    resposta.put("operacao", "listar_usuarios");
+
+	    String token = (String) entrada.get("token");
+
+	    if (token == null || !UsuarioDB.estaLogado(token)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Token invalido");
+	        return resposta;
+	    }
+
+	    Usuario usuario = UsuarioDB.getUsuario(token);
+	    if (!usuario.getPerfil().equals("adm")) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Token inválido, precisa ser administrador!");
+	        return resposta;
+	    }
+
+	    JSONArray usuarios = UsuarioDB.listarTodosUsuarios();
+	    if (usuarios.isEmpty()) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Nenhum usuario cadastrado");
+	        return resposta;
+	    }
+
+	    resposta.put("status", "sucesso");
+	    resposta.put("usuarios", usuarios);
+	    return resposta;
+	}
+	
+	public static JSONObject realizarEdicaoComoAdm(JSONObject entrada) {
+	    JSONObject resposta = new JSONObject();
+	    resposta.put("operacao", "editar_usuario");
+
+	    String token = (String) entrada.get("token");
+	    String usuarioAlvo = (String) entrada.get("usuario_alvo");
+	    String novoNome = (String) entrada.get("novo_nome");
+	    String novaSenha = (String) entrada.get("nova_senha");
+	    String novoPerfil = (String) entrada.get("novo_perfil");
+
+	    // Verifica se o token é válido e está logado
+	    if (token == null || !UsuarioDB.estaLogado(token)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Token inválido");
+	        return resposta;
+	    }
+
+	    Usuario solicitante = UsuarioDB.getUsuario(token);
+	    if (!"adm".equals(solicitante.getPerfil())) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Token inválido");
+	        return resposta;
+	    }
+
+	    // Verifica se usuário alvo existe
+	    Usuario alvo = UsuarioDB.getUsuario(usuarioAlvo);
+	    if (alvo == null) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Usuario não encontrado");
+	        return resposta;
+	    }
+
+	    // Validação dos novos campos
+	    if (novoNome == null || novaSenha == null || novoPerfil == null ||
+	        !Validador.validarNome(novoNome) ||
+	        !Validador.validarSenha(novaSenha) ||
+	        !Validador.validarPerfil(novoPerfil)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Os campos recebidos não são validos");
+	        return resposta;
+	    }
+
+	    // Impede que o admin rebaixe a si mesmo para perfil comum
+	    if (usuarioAlvo.equals(token) && "comum".equals(novoPerfil)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Não é permitido mudar o próprio perfil para comum");
+	        return resposta;
+	    }
+
+	    // Cria novo objeto com os dados atualizados
+	    Usuario atualizado = new Usuario(novoNome, usuarioAlvo, novaSenha, novoPerfil);
+	    UsuarioDB.atualizarUsuario(usuarioAlvo, atualizado);
+
+	    resposta.put("status", "sucesso");
+	    resposta.put("mensagem", "Usuário editado com sucesso");
+	    return resposta;
+	}
+
+
 
 }

@@ -66,6 +66,13 @@ public class ServidorThread extends Thread {
 						out.println(resposta.toJSONString());
 						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
 					}
+					
+					else if ("listar_usuarios".equalsIgnoreCase(operacao)) {
+						JSONObject resposta = UsuarioController.realizarListagemDeUsuarios(entrada);
+						out.println(resposta.toJSONString());
+						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
+					}
+
 
 				} catch (ParseException e) {
 					String erro = "{\"status\":\"erro\",\"operacao\":\"cadastro\",\"mensagem\":\"JSON malformado\"}";

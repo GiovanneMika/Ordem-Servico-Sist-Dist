@@ -5,6 +5,9 @@ import modelo.Usuario;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 public class UsuarioDB {
 	private static HashMap<String, Usuario> usuarios = new HashMap<>();
 	private static HashSet<String> usuariosLogados = new HashSet<>();
@@ -62,5 +65,21 @@ public class UsuarioDB {
 			usuarios.put("admin", admin);
 		}
 	}
+	public static JSONArray listarTodosUsuarios() {
+	    JSONArray lista = new JSONArray();
+
+	    for (Usuario u : usuarios.values()) {
+	        JSONObject usuarioJson = new JSONObject();
+	        usuarioJson.put("nome", u.getNome());
+	        usuarioJson.put("usuario", u.getUsuario());
+	        usuarioJson.put("perfil", u.getPerfil());
+	        lista.add(usuarioJson);
+	    }
+
+	    return lista;
+	}
+
+	
+	
 
 }
