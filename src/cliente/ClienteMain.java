@@ -25,65 +25,19 @@ public class ClienteMain {
             System.out.println("Conectado com o servidor.");
 
             while (true) {
+            	if(token != null) {
                 System.out.println("\n===== MENU =====");
-                System.out.println("1 - Cadastrar usuário");
-                System.out.println("2 - Login");
-                System.out.println("3 - Logout");
-                System.out.println("4 - Ler meus dados");
-                System.out.println("5 - Editar meus dados");
-                System.out.println("6 - Excluir minha conta");
+                System.out.println("1 - Logout");
+                System.out.println("2 - Ler meus dados");
+                System.out.println("3 - Editar meus dados");
+                System.out.println("4 - Excluir minha conta");
                 System.out.println("0 - Sair");
                 System.out.print("Escolha: ");
                 String escolha = teclado.readLine();
 
-                if (escolha.equals("1")) {
-                    JSONObject cadastro = new JSONObject();
-                    cadastro.put("operacao", "cadastro");
-
-                    System.out.print("Nome: ");
-                    cadastro.put("nome", teclado.readLine());
-
-                    System.out.print("Usuario: ");
-                    cadastro.put("usuario", teclado.readLine());
-
-                    System.out.print("Senha: ");
-                    cadastro.put("senha", teclado.readLine());
-
-                    cadastro.put("perfil", "comum");
-
-                    out.println(cadastro.toJSONString());
-                    System.out.println("JSON enviado ao servidor: " + cadastro.toJSONString());
-
-                    String resposta = in.readLine();
-                    System.out.println("JSON recebido do servidor: " + resposta);
-                }
-
-                else if (escolha.equals("2")) {
-                    JSONObject login = new JSONObject();
-                    login.put("operacao", "login");
-
-                    System.out.print("Usuario: ");
-                    login.put("usuario", teclado.readLine());
-
-                    System.out.print("Senha: ");
-                    login.put("senha", teclado.readLine());
-
-                    out.println(login.toJSONString());
-                    System.out.println("JSON enviado ao servidor: " + login.toJSONString());
-
-                    String resposta = in.readLine();
-                    System.out.println("JSON recebido do servidor: " + resposta);
-
-                    if (resposta.contains("\"status\":\"sucesso\"")) {
-                        // extrair o token do JSON (modo simples)
-                        org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
-                        JSONObject obj = (JSONObject) parser.parse(resposta);
-                        token = (String) obj.get("token");
-                    }
-
-                }
+               
                 
-                else if (escolha.equals("3")) {
+                if (escolha.equals("1")) {
                         JSONObject logout = new JSONObject();
                         logout.put("operacao", "logout");
                         logout.put("token", token);
@@ -100,7 +54,7 @@ public class ClienteMain {
                     }
                 }
                 
-                else if (escolha.equals("4")) {
+                else if (escolha.equals("2")) {
                     JSONObject leitura = new JSONObject();
                     leitura.put("operacao", "ler_dados");
                     leitura.put("token", token);
@@ -112,7 +66,7 @@ public class ClienteMain {
                     System.out.println("JSON recebido do servidor: " + resposta);
                 }
                 
-                else if (escolha.equals("5")) {
+                else if (escolha.equals("3")) {
                     JSONObject editar = new JSONObject();
                     editar.put("operacao", "editar_usuario");
                     editar.put("token", token);
@@ -139,7 +93,7 @@ public class ClienteMain {
                     }
                 }
                 
-                else if (escolha.equals("6")) {
+                else if (escolha.equals("4")) {
                     JSONObject excluir = new JSONObject();
                     excluir.put("operacao", "excluir_usuario");
                     excluir.put("token", token);
@@ -166,6 +120,71 @@ public class ClienteMain {
                 else {
                     System.out.println("Opção inválida!");
                 }
+            }else {
+            	 System.out.println("\n===== MENU =====");
+                 System.out.println("1 - Cadastrar usuário");
+                 System.out.println("2 - Login");
+                 System.out.println("0 - Sair");
+
+                 String escolha = teclado.readLine();
+                 
+                 if (escolha.equals("1")) {
+                     JSONObject cadastro = new JSONObject();
+                     cadastro.put("operacao", "cadastro");
+
+                     System.out.print("Nome: ");
+                     cadastro.put("nome", teclado.readLine());
+
+                     System.out.print("Usuario: ");
+                     cadastro.put("usuario", teclado.readLine());
+
+                     System.out.print("Senha: ");
+                     cadastro.put("senha", teclado.readLine());
+
+                     cadastro.put("perfil", "comum");
+
+                     out.println(cadastro.toJSONString());
+                     System.out.println("JSON enviado ao servidor: " + cadastro.toJSONString());
+
+                     String resposta = in.readLine();
+                     System.out.println("JSON recebido do servidor: " + resposta);
+                 }
+
+                 else if (escolha.equals("2")) {
+                     JSONObject login = new JSONObject();
+                     login.put("operacao", "login");
+
+                     System.out.print("Usuario: ");
+                     login.put("usuario", teclado.readLine());
+
+                     System.out.print("Senha: ");
+                     login.put("senha", teclado.readLine());
+
+                     out.println(login.toJSONString());
+                     System.out.println("JSON enviado ao servidor: " + login.toJSONString());
+
+                     String resposta = in.readLine();
+                     System.out.println("JSON recebido do servidor: " + resposta);
+
+                     if (resposta.contains("\"status\":\"sucesso\"")) {
+                         // extrair o token do JSON (modo simples)
+                         org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+                         JSONObject obj = (JSONObject) parser.parse(resposta);
+                         token = (String) obj.get("token");
+                     }
+
+                 }
+                 
+                 else if (escolha.equals("0")) {
+                     System.out.println("Encerrando cliente...");
+                     break;
+                 }
+
+                 else {
+                     System.out.println("Opção inválida!");
+                 }
+                 
+            }
             }
 
             socket.close();
