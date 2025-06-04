@@ -8,169 +8,166 @@ import utils.Validador;
 
 public class UsuarioController {
 
-    public static JSONObject realizarCadastro(JSONObject entrada) {
-        JSONObject resposta = new JSONObject();
-        resposta.put("operacao", "cadastro");
+	public static JSONObject realizarCadastro(JSONObject entrada) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "cadastro");
 
-        String nome = (String) entrada.get("nome");
-        String usuario = (String) entrada.get("usuario");
-        String senha = (String) entrada.get("senha");
-        String perfil = (String) entrada.get("perfil");
+		String nome = (String) entrada.get("nome");
+		String usuario = (String) entrada.get("usuario");
+		String senha = (String) entrada.get("senha");
+		String perfil = (String) entrada.get("perfil");
 
-        if (nome == null || usuario == null || senha == null || perfil == null || !Validador.validarPerfil(perfil) ||
-                !Validador.validarNome(nome) || !Validador.validarUsuario(usuario) || !Validador.validarSenha(senha)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Os campos recebidos não são válidos");
-        } else if (UsuarioDB.usuarioExiste(usuario)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Usuário já cadastrado");
-        } else {
-            Usuario novoUsuario = new Usuario(nome, usuario, senha, perfil);
-            UsuarioDB.adicionarUsuario(novoUsuario);
-            resposta.put("status", "sucesso");
-            resposta.put("mensagem", "Cadastro realizado com sucesso");
-        }
+		if (nome == null || usuario == null || senha == null || perfil == null || !Validador.validarPerfil(perfil)
+				|| !Validador.validarNome(nome) || !Validador.validarUsuario(usuario)
+				|| !Validador.validarSenha(senha)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Os campos recebidos não são válidos");
+		} else if (UsuarioDB.usuarioExiste(usuario)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Usuário já cadastrado");
+		} else {
+			Usuario novoUsuario = new Usuario(nome, usuario, senha, perfil);
+			UsuarioDB.adicionarUsuario(novoUsuario);
+			resposta.put("status", "sucesso");
+			resposta.put("mensagem", "Cadastro realizado com sucesso");
+		}
 
-        return resposta;
-    }
+		return resposta;
+	}
 
-    public static JSONObject realizarLogin(JSONObject entrada) {
-        JSONObject resposta = new JSONObject();
-        resposta.put("operacao", "login");
+	public static JSONObject realizarLogin(JSONObject entrada) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "login");
 
-        String usuario = (String) entrada.get("usuario");
-        String senha = (String) entrada.get("senha");
+		String usuario = (String) entrada.get("usuario");
+		String senha = (String) entrada.get("senha");
 
-        if (usuario == null || senha == null || usuario.isBlank() || senha.isBlank()) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Informações incorretas");
-        } else if (!UsuarioDB.usuarioExiste(usuario)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Informações incorretas");
-        } else if (UsuarioDB.estaLogado(usuario)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Usuario já logado");
-        } else if (!UsuarioDB.login(usuario, senha)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Informações incorretas");
-        } else {
-            Usuario u = UsuarioDB.getUsuario(usuario);
-            resposta.put("status", "sucesso");
-            resposta.put("token", usuario);
-            resposta.put("perfil", u.getPerfil());
-        }
+		if (usuario == null || senha == null || usuario.isBlank() || senha.isBlank()) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Informações incorretas");
+		} else if (!UsuarioDB.usuarioExiste(usuario)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Informações incorretas");
+		} else if (UsuarioDB.estaLogado(usuario)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Usuario já logado");
+		} else if (!UsuarioDB.login(usuario, senha)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Informações incorretas");
+		} else {
+			Usuario u = UsuarioDB.getUsuario(usuario);
+			resposta.put("status", "sucesso");
+			resposta.put("token", usuario);
+			resposta.put("perfil", u.getPerfil());
+		}
 
-        return resposta;
-    }
+		return resposta;
+	}
 
-    public static JSONObject realizarLogout(JSONObject entrada) {
-        JSONObject resposta = new JSONObject();
-        resposta.put("operacao", "logout");
+	public static JSONObject realizarLogout(JSONObject entrada) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "logout");
 
-        String token = (String) entrada.get("token");
+		String token = (String) entrada.get("token");
 
-        if (token == null || token.isBlank() || !UsuarioDB.estaLogado(token)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Token invalido");
-        } else {
-            UsuarioDB.logout(token);
-            resposta.put("status", "sucesso");
-            resposta.put("mensagem", "Logout realizado com sucesso");
-        }
+		if (token == null || token.isBlank() || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token invalido");
+		} else {
+			UsuarioDB.logout(token);
+			resposta.put("status", "sucesso");
+			resposta.put("mensagem", "Logout realizado com sucesso");
+		}
 
-        return resposta;
-    }
-    
-    public static JSONObject realizarLeituraDeDados(JSONObject entrada) {
-        JSONObject resposta = new JSONObject();
-        resposta.put("operacao", "ler_dados");
+		return resposta;
+	}
 
-        String token = (String) entrada.get("token");
+	public static JSONObject realizarLeituraDeDados(JSONObject entrada) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "ler_dados");
 
-        if (token == null || token.isBlank() || !UsuarioDB.estaLogado(token)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Token invalido");
-        } else {
-            Usuario usuario = UsuarioDB.getUsuario(token);
+		String token = (String) entrada.get("token");
 
-            JSONObject dados = new JSONObject();
-            dados.put("nome", usuario.getNome());
-            dados.put("usuario", usuario.getUsuario());
-            dados.put("senha", usuario.getSenha());
+		if (token == null || token.isBlank() || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token invalido");
+		} else {
+			Usuario usuario = UsuarioDB.getUsuario(token);
 
-            resposta.put("status", "sucesso");
-            resposta.put("dados", dados);
-        }
+			JSONObject dados = new JSONObject();
+			dados.put("nome", usuario.getNome());
+			dados.put("usuario", usuario.getUsuario());
+			dados.put("senha", usuario.getSenha());
 
-        return resposta;
-    }
-    
-    public static JSONObject realizarEdicao(JSONObject entrada) {
-        JSONObject resposta = new JSONObject();
-        resposta.put("operacao", "editar_usuario");
+			resposta.put("status", "sucesso");
+			resposta.put("dados", dados);
+		}
 
-        String token = (String) entrada.get("token");
-        String novoUsuario = (String) entrada.get("novo_usuario");
-        String novoNome = (String) entrada.get("novo_nome");
-        String novaSenha = (String) entrada.get("nova_senha");
+		return resposta;
+	}
 
-        // Verifica se o token é válido
-        if (token == null || !UsuarioDB.estaLogado(token)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Token invalido");
-            return resposta;
-        }
+	public static JSONObject realizarEdicao(JSONObject entrada) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "editar_usuario");
 
-        // Verifica campos obrigatórios
-        if (novoUsuario == null || novoNome == null || novaSenha == null ||
-            !Validador.validarNome(novoNome) ||
-            !Validador.validarUsuario(novoUsuario) ||
-            !Validador.validarSenha(novaSenha)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Campos inválidos");
-            return resposta;
-        }
+		String token = (String) entrada.get("token");
+		String novoUsuario = (String) entrada.get("novo_usuario");
+		String novoNome = (String) entrada.get("novo_nome");
+		String novaSenha = (String) entrada.get("nova_senha");
 
-        // Se novo usuário já existir com outro nome
-        if (!token.equals(novoUsuario) && UsuarioDB.usuarioExiste(novoUsuario)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Usuario já cadastrado");
-            return resposta;
-        }
+		// Verifica se o token é válido
+		if (token == null || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token invalido");
+			return resposta;
+		}
 
-        // Atualiza o usuário
-        Usuario usuarioAntigo = UsuarioDB.getUsuario(token);
-        Usuario novo = new Usuario(novoNome, novoUsuario, novaSenha, usuarioAntigo.getPerfil());
+		// Verifica campos obrigatórios
+		if (novoUsuario == null || novoNome == null || novaSenha == null || !Validador.validarNome(novoNome)
+				|| !Validador.validarUsuario(novoUsuario) || !Validador.validarSenha(novaSenha)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Campos inválidos");
+			return resposta;
+		}
 
-        UsuarioDB.atualizarUsuario(token, novo);
-        resposta.put("status", "sucesso");
-        resposta.put("mensagem", "Dados atualizados com sucesso");
-        resposta.put("token", novoUsuario);  // token é atualizado
+		// Se novo usuário já existir com outro nome
+		if (!token.equals(novoUsuario) && UsuarioDB.usuarioExiste(novoUsuario)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Usuario já cadastrado");
+			return resposta;
+		}
 
-        return resposta;
-    }
-    
-    public static JSONObject realizarExclusao(JSONObject entrada) {
-        JSONObject resposta = new JSONObject();
-        resposta.put("operacao", "excluir_usuario");
+		// Atualiza o usuário
+		Usuario usuarioAntigo = UsuarioDB.getUsuario(token);
+		Usuario novo = new Usuario(novoNome, novoUsuario, novaSenha, usuarioAntigo.getPerfil());
 
-        String token = (String) entrada.get("token");
+		UsuarioDB.atualizarUsuario(token, novo);
+		resposta.put("status", "sucesso");
+		resposta.put("mensagem", "Dados atualizados com sucesso");
+		resposta.put("token", novoUsuario); // token é atualizado
 
-        // Verifica se o token é válido
-        if (token == null || !UsuarioDB.estaLogado(token)) {
-            resposta.put("status", "erro");
-            resposta.put("mensagem", "Token invalido");
-            return resposta;
-        }
+		return resposta;
+	}
 
-        // Remove usuário
-        UsuarioDB.excluirUsuario(token);
-        resposta.put("status", "sucesso");
-        resposta.put("mensagem", "Conta excluída com sucesso");
+	public static JSONObject realizarExclusao(JSONObject entrada) {
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "excluir_usuario");
 
-        return resposta;
-    }
+		String token = (String) entrada.get("token");
 
+		// Verifica se o token é válido
+		if (token == null || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token invalido");
+			return resposta;
+		}
 
+		// Remove usuário
+		UsuarioDB.excluirUsuario(token);
+		resposta.put("status", "sucesso");
+		resposta.put("mensagem", "Conta excluída com sucesso");
+
+		return resposta;
+	}
 
 }
