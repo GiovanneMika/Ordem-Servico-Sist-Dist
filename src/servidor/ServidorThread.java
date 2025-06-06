@@ -30,6 +30,7 @@ public class ServidorThread extends Thread {
 				try {
 					JSONObject entrada = (JSONObject) parser.parse(inputLine);
 					String operacao = (String) entrada.get("operacao");
+					String usuarioAlvo = (String) entrada.get("usuario_alvo");
 
 					if ("cadastro".equalsIgnoreCase(operacao)) {
 						JSONObject resposta = UsuarioController.realizarCadastro(entrada);
@@ -54,6 +55,11 @@ public class ServidorThread extends Thread {
 						out.println(resposta.toJSONString());
 						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
 					}
+					else if ("editar_usuario".equalsIgnoreCase(operacao)&& (!(usuarioAlvo==null) || !usuarioAlvo.isEmpty())) {
+						JSONObject resposta = UsuarioController.realizarEdicaoComoAdm(entrada);
+						out.println(resposta.toJSONString());
+						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
+					}
 
 					else if ("editar_usuario".equalsIgnoreCase(operacao)) {
 						JSONObject resposta = UsuarioController.realizarEdicao(entrada);
@@ -72,6 +78,8 @@ public class ServidorThread extends Thread {
 						out.println(resposta.toJSONString());
 						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
 					}
+					
+
 
 
 				} catch (ParseException e) {
