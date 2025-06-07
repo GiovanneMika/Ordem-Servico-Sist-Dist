@@ -243,7 +243,7 @@ public class UsuarioController {
 	    Usuario solicitante = UsuarioDB.getUsuario(token);
 	    if (!"adm".equals(solicitante.getPerfil())) {
 	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Token inválido");
+	        resposta.put("mensagem", "Somente administradores podem fazer essa ação!");
 	        return resposta;
 	    }
 
@@ -280,6 +280,50 @@ public class UsuarioController {
 	    resposta.put("mensagem", "Usuário editado com sucesso");
 	    return resposta;
 	}
+	
+	public static JSONObject realizarExclusaoComoAdm(JSONObject entrada) {
+	    JSONObject resposta = new JSONObject();
+	    resposta.put("operacao", "excluir_usuario");
+
+	    String token = (String) entrada.get("token");
+	    String usuarioAlvo = (String) entrada.get("usuario_alvo");
+
+	    // Verifica se token é válido
+	    if (token == null || !UsuarioDB.estaLogado(token)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Token invalido");
+	        return resposta;
+	    }
+
+	    Usuario solicitante = UsuarioDB.getUsuario(token);
+
+	    // Verifica se é administrador
+	    if (!"adm".equals(solicitante.getPerfil())) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Somente administradores podem excluir usuários");
+	        return resposta;
+	    }
+
+	    // Impede que admin exclua a si mesmo
+	    if (token.equals(usuarioAlvo)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Administrador não pode excluir a si mesmo");
+	        return resposta;
+	    }
+
+	    // Verifica se o usuário alvo existe
+	    if (!UsuarioDB.usuarioExiste(usuarioAlvo)) {
+	        resposta.put("status", "erro");
+	        resposta.put("mensagem", "Usuário alvo não encontrado");
+	        return resposta;
+	    }
+
+	    UsuarioDB.excluirUsuario(usuarioAlvo);
+	    resposta.put("status", "sucesso");
+	    resposta.put("mensagem", "Usuário excluído com sucesso");
+	    return resposta;
+	}
+
 
 
 

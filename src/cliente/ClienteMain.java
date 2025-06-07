@@ -128,6 +128,7 @@ public class ClienteMain {
 						System.out.println("3 - Cadastrar novo usuário comum");
 						System.out.println("4 - Listar todos os usuários");
 						System.out.println("5 - Editar usuário comum");
+						System.out.println("6 - Excluir usuário comum");
 						System.out.println("0 - Sair");
 						System.out.print("Escolha: ");
 						String escolha = teclado.readLine();
@@ -218,6 +219,22 @@ public class ClienteMain {
 							String resposta = in.readLine();
 							System.out.println("JSON recebido do servidor: " + resposta);
 						}
+						
+						else if (escolha.equals("6")) {
+							JSONObject excluir = new JSONObject();
+							excluir.put("operacao", "excluir_usuario");
+							excluir.put("token", token);
+
+							System.out.print("Usuário a ser excluído: ");
+							excluir.put("usuario_alvo", teclado.readLine());
+
+							out.println(excluir.toJSONString());
+							System.out.println("JSON enviado ao servidor: " + excluir.toJSONString());
+
+							String resposta = in.readLine();
+							System.out.println("JSON recebido do servidor: " + resposta);
+						}
+
 
 						
 						else if (escolha.equals("0")) {

@@ -55,20 +55,15 @@ public class ServidorThread extends Thread {
 						out.println(resposta.toJSONString());
 						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
 					}
-					else if ("editar_usuario".equalsIgnoreCase(operacao)&& (!(usuarioAlvo==null) || !usuarioAlvo.isEmpty())) {
-						JSONObject resposta = UsuarioController.realizarEdicaoComoAdm(entrada);
-						out.println(resposta.toJSONString());
-						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
-					}
-
 					else if ("editar_usuario".equalsIgnoreCase(operacao)) {
-						JSONObject resposta = UsuarioController.realizarEdicao(entrada);
-						out.println(resposta.toJSONString());
-						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
-					}
+						JSONObject resposta;
 
-					else if ("excluir_usuario".equalsIgnoreCase(operacao)) {
-						JSONObject resposta = UsuarioController.realizarExclusao(entrada);
+						if (entrada.containsKey("usuario_alvo") && entrada.get("usuario_alvo") != null && !((String) entrada.get("usuario_alvo")).isEmpty()) {
+							resposta = UsuarioController.realizarEdicaoComoAdm(entrada);
+						} else {
+							resposta = UsuarioController.realizarEdicao(entrada); // edição própria
+						}
+
 						out.println(resposta.toJSONString());
 						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
 					}
@@ -79,8 +74,17 @@ public class ServidorThread extends Thread {
 						System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
 					}
 					
+					else if ("excluir_usuario".equals(operacao)) {
+					    JSONObject resposta;
 
+					    if (entrada.containsKey("usuario_alvo")) {
+					        resposta = UsuarioController.realizarExclusaoComoAdm(entrada);
+					    } else {
+					        resposta = UsuarioController.realizarExclusao(entrada); // exclusão própria
+					    }
 
+					    out.println(resposta.toJSONString());
+					}
 
 				} catch (ParseException e) {
 					String erro = "{\"status\":\"erro\",\"operacao\":\"cadastro\",\"mensagem\":\"JSON malformado\"}";
