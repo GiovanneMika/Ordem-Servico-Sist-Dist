@@ -18,10 +18,22 @@ public class UsuarioController {
 		String usuario = (String) entrada.get("usuario");
 		String senha = (String) entrada.get("senha");
 		String perfil = (String) entrada.get("perfil");
+		String token = (String) entrada.get("token");
+
+		if (token == null) {
+			perfil = "comum";
+		} else {
+			Usuario solicitante = UsuarioDB.getUsuario(token);
+			if (!"adm".equals(solicitante.getPerfil()) && "adm".equals(perfil)) {
+				resposta.put("status", "erro");
+				resposta.put("mensagem", "Somente administradores podem fazer essa ação!");
+				return resposta;
+			}
+		}
 
 		if (nome == null || usuario == null || senha == null || perfil == null || !Validador.validarPerfil(perfil)
-				|| !Validador.validarNome(nome) || !Validador.validarUsuario(usuario)
-				|| !Validador.validarSenha(senha)) {
+				|| !Validador.validarNome(nome) || !Validador.validarUsuario(usuario) || !Validador.validarSenha(senha)
+				|| usuario.equalsIgnoreCase("admin")) {
 			resposta.put("status", "erro");
 			resposta.put("mensagem", "Os campos recebidos não são válidos");
 		} else if (UsuarioDB.usuarioExiste(usuario)) {
@@ -84,7 +96,6 @@ public class UsuarioController {
 
 		return resposta;
 	}
-
 
 	public static JSONObject realizarLogout(JSONObject entrada) {
 		JSONObject resposta = new JSONObject();
@@ -191,140 +202,156 @@ public class UsuarioController {
 
 		return resposta;
 	}
-	
+
 	public static JSONObject realizarListagemDeUsuarios(JSONObject entrada) {
-	    JSONObject resposta = new JSONObject();
-	    resposta.put("operacao", "listar_usuarios");
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "listar_usuarios");
 
-	    String token = (String) entrada.get("token");
+		String token = (String) entrada.get("token");
 
-	    if (token == null || !UsuarioDB.estaLogado(token)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Token invalido");
-	        return resposta;
-	    }
+		if (token == null || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token invalido");
+			return resposta;
+		}
 
-	    Usuario usuario = UsuarioDB.getUsuario(token);
-	    if (!usuario.getPerfil().equals("adm")) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Token inválido, precisa ser administrador!");
-	        return resposta;
-	    }
+		Usuario usuario = UsuarioDB.getUsuario(token);
+		if (!usuario.getPerfil().equals("adm")) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token inválido, precisa ser administrador!");
+			return resposta;
+		}
 
-	    JSONArray usuarios = UsuarioDB.listarTodosUsuarios();
-	    if (usuarios.isEmpty()) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Nenhum usuario cadastrado");
-	        return resposta;
-	    }
+		JSONArray usuarios = UsuarioDB.listarTodosUsuarios();
+		if (usuarios.isEmpty()) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Nenhum usuario cadastrado");
+			return resposta;
+		}
 
-	    resposta.put("status", "sucesso");
-	    resposta.put("usuarios", usuarios);
-	    return resposta;
+		resposta.put("status", "sucesso");
+		resposta.put("usuarios", usuarios);
+		return resposta;
 	}
-	
+
 	public static JSONObject realizarEdicaoComoAdm(JSONObject entrada) {
-	    JSONObject resposta = new JSONObject();
-	    resposta.put("operacao", "editar_usuario");
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "editar_usuario");
 
-	    String token = (String) entrada.get("token");
-	    String usuarioAlvo = (String) entrada.get("usuario_alvo");
-	    String novoNome = (String) entrada.get("novo_nome");
-	    String novaSenha = (String) entrada.get("nova_senha");
-	    String novoPerfil = (String) entrada.get("novo_perfil");
+		String token = (String) entrada.get("token");
+		String usuarioAlvo = (String) entrada.get("usuario_alvo");
+		String novoNome = (String) entrada.get("novo_nome");
+		String novaSenha = (String) entrada.get("nova_senha");
+		String novoPerfil = (String) entrada.get("novo_perfil");
 
-	    // Verifica se o token é válido e está logado
-	    if (token == null || !UsuarioDB.estaLogado(token)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Token inválido");
-	        return resposta;
-	    }
+		// Verifica se o token é válido e está logado
+		if (token == null || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token inválido");
+			return resposta;
+		}
 
-	    Usuario solicitante = UsuarioDB.getUsuario(token);
-	    if (!"adm".equals(solicitante.getPerfil())) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Somente administradores podem fazer essa ação!");
-	        return resposta;
-	    }
+		Usuario solicitante = UsuarioDB.getUsuario(token);
+		if (!"adm".equals(solicitante.getPerfil())) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Somente administradores podem fazer essa ação!");
+			return resposta;
+		}
 
-	    // Verifica se usuário alvo existe
-	    Usuario alvo = UsuarioDB.getUsuario(usuarioAlvo);
-	    if (alvo == null) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Usuario não encontrado");
-	        return resposta;
-	    }
+		// Verifica se usuário alvo existe
+		Usuario alvo = UsuarioDB.getUsuario(usuarioAlvo);
+		if (alvo == null) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Usuario não encontrado");
+			return resposta;
+		}
 
-	    // Validação dos novos campos
-	    if (novoNome == null || novaSenha == null || novoPerfil == null ||
-	        !Validador.validarNome(novoNome) ||
-	        !Validador.validarSenha(novaSenha) ||
-	        !Validador.validarPerfil(novoPerfil)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Os campos recebidos não são validos");
-	        return resposta;
-	    }
+		// impede que o administrador padrão seja editado
+		if (alvo.getUsuario().equalsIgnoreCase("admin")) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Não se pode editar o administrador padrão!");
+			return resposta;
+		}
 
-	    // Impede que o admin rebaixe a si mesmo para perfil comum
-	    if (usuarioAlvo.equals(token) && "comum".equals(novoPerfil)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Não é permitido mudar o próprio perfil para comum");
-	        return resposta;
-	    }
+		// Validação dos novos campos
+		if (novoNome == null || novaSenha == null || novoPerfil == null || !Validador.validarNome(novoNome)
+				|| !Validador.validarSenha(novaSenha) || !Validador.validarPerfil(novoPerfil)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Os campos recebidos não são validos");
+			return resposta;
+		}
 
-	    // Cria novo objeto com os dados atualizados
-	    Usuario atualizado = new Usuario(novoNome, usuarioAlvo, novaSenha, novoPerfil);
-	    UsuarioDB.atualizarUsuario(usuarioAlvo, atualizado);
+		// Impede que o admin rebaixe a si mesmo para perfil comum
+		if (usuarioAlvo.equals(token) && "comum".equals(novoPerfil)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Não é permitido mudar o próprio perfil para comum");
+			return resposta;
+		}
 
-	    resposta.put("status", "sucesso");
-	    resposta.put("mensagem", "Usuário editado com sucesso");
-	    return resposta;
+		// Cria novo objeto com os dados atualizados
+		Usuario atualizado = new Usuario(novoNome, usuarioAlvo, novaSenha, novoPerfil);
+		UsuarioDB.atualizarUsuario(usuarioAlvo, atualizado);
+
+		resposta.put("status", "sucesso");
+		resposta.put("mensagem", "Usuário editado com sucesso");
+		return resposta;
 	}
-	
+
 	public static JSONObject realizarExclusaoComoAdm(JSONObject entrada) {
-	    JSONObject resposta = new JSONObject();
-	    resposta.put("operacao", "excluir_usuario");
+		JSONObject resposta = new JSONObject();
+		resposta.put("operacao", "excluir_usuario");
 
-	    String token = (String) entrada.get("token");
-	    String usuarioAlvo = (String) entrada.get("usuario_alvo");
+		String token = (String) entrada.get("token");
+		String usuarioAlvo = (String) entrada.get("usuario_alvo");
 
-	    // Verifica se token é válido
-	    if (token == null || !UsuarioDB.estaLogado(token)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Token invalido");
-	        return resposta;
-	    }
+		// Verifica se token é válido
+		if (token == null || !UsuarioDB.estaLogado(token)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Token invalido");
+			return resposta;
+		}
 
-	    Usuario solicitante = UsuarioDB.getUsuario(token);
+		Usuario solicitante = UsuarioDB.getUsuario(token);
+		Usuario alvo = UsuarioDB.getUsuario(usuarioAlvo);
 
-	    // Verifica se é administrador
-	    if (!"adm".equals(solicitante.getPerfil())) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Somente administradores podem excluir usuários");
-	        return resposta;
-	    }
+		// Verifica se é administrador
+		if (!"adm".equals(solicitante.getPerfil())) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Somente administradores podem excluir usuários");
+			return resposta;
+		}
+		
+		if(alvo == null) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "É preciso de um usuário alvo!");
+			return resposta;
+		}
 
-	    // Impede que admin exclua a si mesmo
-	    if (token.equals(usuarioAlvo)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Administrador não pode excluir a si mesmo");
-	        return resposta;
-	    }
+		// impede que o administrador padrão seja excluido
+		if (alvo.getUsuario().equalsIgnoreCase("admin") ) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Não se pode excluir o administrador padrão!");
+			return resposta;
+		}
 
-	    // Verifica se o usuário alvo existe
-	    if (!UsuarioDB.usuarioExiste(usuarioAlvo)) {
-	        resposta.put("status", "erro");
-	        resposta.put("mensagem", "Usuário alvo não encontrado");
-	        return resposta;
-	    }
+		// Impede que admin exclua a si mesmo
+		if (token.equals(usuarioAlvo)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Administrador não pode excluir a si mesmo");
+			return resposta;
+		}
 
-	    UsuarioDB.excluirUsuario(usuarioAlvo);
-	    resposta.put("status", "sucesso");
-	    resposta.put("mensagem", "Usuário excluído com sucesso");
-	    return resposta;
+		// Verifica se o usuário alvo existe
+		if (!UsuarioDB.usuarioExiste(usuarioAlvo)) {
+			resposta.put("status", "erro");
+			resposta.put("mensagem", "Usuário alvo não encontrado");
+			return resposta;
+		}
+
+		UsuarioDB.excluirUsuario(usuarioAlvo);
+		resposta.put("status", "sucesso");
+		resposta.put("mensagem", "Usuário excluído com sucesso");
+		return resposta;
 	}
-
-
-
 
 }

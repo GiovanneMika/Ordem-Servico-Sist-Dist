@@ -125,10 +125,10 @@ public class ClienteMain {
 						System.out.println("\n===== MENU ADMINISTRATIVO =====");
 						System.out.println("1 - Logout");
 						System.out.println("2 - Ler meus dados");
-						System.out.println("3 - Cadastrar novo usuário comum");
+						System.out.println("3 - Cadastrar novo usuário");
 						System.out.println("4 - Listar todos os usuários");
-						System.out.println("5 - Editar usuário comum");
-						System.out.println("6 - Excluir usuário comum");
+						System.out.println("5 - Editar usuário do sistema");
+						System.out.println("6 - Excluir usuário do sistema");
 						System.out.println("0 - Sair");
 						System.out.print("Escolha: ");
 						String escolha = teclado.readLine();
@@ -174,8 +174,11 @@ public class ClienteMain {
 
 							System.out.print("Senha: ");
 							cadastro.put("senha", teclado.readLine());
-
-							cadastro.put("perfil", "comum");
+							
+							System.out.print("Perfil(adm/comum): ");
+							cadastro.put("perfil", teclado.readLine());
+							
+							cadastro.put("token", token);
 
 							out.println(cadastro.toJSONString());
 							System.out.println("JSON enviado ao servidor: " + cadastro.toJSONString());
