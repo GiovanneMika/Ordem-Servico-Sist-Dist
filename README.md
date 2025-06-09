@@ -1,6 +1,10 @@
+Aqui está a versão atualizada do seu **README.md**, refletindo as novas funcionalidades, especialmente as distinções entre usuário comum e administrador:
+
+---
+
 # 📡 Sistema Cliente-Servidor em Java (JSON via TCP/IP)
 
-Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comunicação via sockets TCP/IP utilizando mensagens em formato **JSON**. O sistema permite o cadastro, login, edição, leitura e exclusão de usuários até o momento da entrega parcial 1.
+Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comunicação via sockets TCP/IP utilizando mensagens em formato **JSON**. O sistema permite cadastro, login, autenticação via token e funcionalidades específicas para usuários comuns e administradores.
 
 ## 🗂️ Estrutura do Projeto
 
@@ -24,11 +28,20 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
 
 ## ✅ Funcionalidades
 
-* Cadastro de usuários
+### 👤 Usuário Comum
+
 * Login e logout
-* Leitura de dados do usuário
-* Edição de dados pessoais
-* Exclusão da conta
+* Leitura dos próprios dados
+* Edição dos próprios dados (nome, usuário, senha)
+* Exclusão da própria conta
+
+### 🛠️ Administrador
+
+* Todas as funções do usuário comum
+* Cadastro de novos usuários (comum ou admin)
+* Listagem de todos os usuários do sistema
+* Edição de qualquer usuário do sistema (inclusive troca de perfil)
+* Exclusão de qualquer usuário do sistema
 
 ---
 
@@ -58,7 +71,7 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
 
 4. Informe a porta desejada quando solicitado (exemplo: `12345`).
 
-   O terminal exibirá:
+   A seguinte mensagem será exibida:
 
    ```
    Servidor rodando na porta 12345
@@ -68,7 +81,7 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
 
 ## 💻 Como executar o Cliente
 
-1. Em outro terminal (ou máquina), compile o cliente e as dependências:
+1. Em outro terminal (ou máquina), compile o cliente:
 
    ```bash
    javac cliente/ClienteMain.java
@@ -80,44 +93,58 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
    java cliente.ClienteMain
    ```
 
-3. Informe o IP do servidor (por exemplo, `127.0.0.1` se for local) e a mesma porta configurada no servidor.
+3. Informe o IP do servidor (ex: `127.0.0.1`) e a porta usada no servidor.
 
 ---
 
-## 📦 Exemplo de Uso
+## 📦 Exemplos de Uso
 
-```text
+### Após o login:
+
+#### Usuário comum verá o menu:
+
+```
 ===== MENU =====
-1 - Cadastrar usuário
-2 - Login
-3 - Logout
-4 - Ler meus dados
-5 - Editar meus dados
-6 - Excluir minha conta
+1 - Logout
+2 - Ler meus dados
+3 - Editar meus dados
+4 - Excluir minha conta
 0 - Sair
 ```
 
-Após cada operação, o cliente enviará um JSON ao servidor e exibirá o JSON de resposta.
+#### Usuário administrador verá o menu:
+
+```
+===== MENU ADMINISTRATIVO =====
+1 - Logout
+2 - Ler meus dados
+3 - Cadastrar novo usuário
+4 - Listar todos os usuários
+5 - Editar usuário do sistema
+6 - Excluir usuário do sistema
+0 - Sair
+```
 
 ---
 
 ## 🛡️ Autenticação
 
-Após o login bem-sucedido, o servidor retorna um **token**, que é armazenado pelo cliente e enviado nas requisições que exigem autenticação (como leitura, edição ou exclusão de dados).
+Após login bem-sucedido, o servidor retorna um **token de autenticação** e o **perfil** do usuário (`comum` ou `adm`). Esse token deve ser incluído em todas as requisições subsequentes que exigem autenticação.
 
 ---
 
 ## 📁 Observações
 
-* Os dados de usuários são armazenados em memória, ou seja, serão perdidos ao encerrar o servidor.
-* O sistema suporta múltiplos clientes simultâneos utilizando `threads`.
-* Cada usuário pode estar logado em apenas uma sessão por vez.
+* Os dados são mantidos **em memória**, portanto **serão perdidos** ao reiniciar o servidor.
+* O sistema suporta múltiplos clientes simultaneamente via **threads**.
+* Um usuário só pode estar **logado em uma sessão por vez**.
+* As operações administrativas são permitidas **somente a usuários com perfil `adm`**.
 
 ---
 
 ## 🧪 Exemplo de JSONs trocados
 
-**Cadastro:**
+### Cadastro (pelo admin):
 
 ```json
 {
@@ -125,17 +152,21 @@ Após o login bem-sucedido, o servidor retorna um **token**, que é armazenado p
   "nome": "João",
   "usuario": "joao123",
   "senha": "1234",
-  "perfil": "comum"
+  "perfil": "comum",
+  "token": "TOKEN_DO_ADMIN"
 }
 ```
 
-**Resposta:**
+### Edição de outro usuário (admin):
 
 ```json
 {
-  "operacao": "cadastro",
-  "status": "sucesso",
-  "mensagem": "Cadastro realizado com sucesso"
+  "operacao": "editar_usuario",
+  "usuario_alvo": "joao123",
+  "novo_nome": "João Silva",
+  "nova_senha": "novaSenha",
+  "novo_perfil": "adm",
+  "token": "TOKEN_DO_ADMIN"
 }
 ```
 
@@ -143,5 +174,8 @@ Após o login bem-sucedido, o servidor retorna um **token**, que é armazenado p
 
 ## 👨‍💻 Desenvolvido por
 
-Discente Giovanne Ribeiro Mika para projeto acadêmico da disciplina de Sistemas Distríbuidos.
+Discente **Giovanne Ribeiro Mika** para projeto acadêmico da disciplina de **Sistemas Distribuídos**.
 
+---
+
+Se quiser, posso ajudar a incluir prints de tela ou fluxogramas no README também. Deseja isso?
