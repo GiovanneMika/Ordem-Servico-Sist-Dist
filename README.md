@@ -1,7 +1,3 @@
-Aqui está a versão atualizada do seu **README.md**, refletindo as novas funcionalidades, especialmente as distinções entre usuário comum e administrador:
-
----
-
 # 📡 Sistema Cliente-Servidor em Java (JSON via TCP/IP)
 
 Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comunicação via sockets TCP/IP utilizando mensagens em formato **JSON**. O sistema permite cadastro, login, autenticação via token e funcionalidades específicas para usuários comuns e administradores.
@@ -176,6 +172,3 @@ Após login bem-sucedido, o servidor retorna um **token de autenticação** e o 
 
 Discente **Giovanne Ribeiro Mika** para projeto acadêmico da disciplina de **Sistemas Distribuídos**.
 
----
-
-Se quiser, posso ajudar a incluir prints de tela ou fluxogramas no README também. Deseja isso?
