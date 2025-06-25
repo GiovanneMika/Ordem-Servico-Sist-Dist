@@ -28,12 +28,15 @@ public class ClienteMain {
 			while (true) {
 				if (token != null) {
 					if (!"adm".equals(perfil)) {
-						System.out.println(perfil);
+						//tela de usuario comum
 					System.out.println("\n===== MENU =====");
 					System.out.println("1 - Logout");
 					System.out.println("2 - Ler meus dados");
 					System.out.println("3 - Editar meus dados");
 					System.out.println("4 - Excluir minha conta");
+					System.out.println("5 - Cadastrar Ordem de Serviço");
+					System.out.println("6 - Listar Minhas Ordens de Serviço");
+					System.out.println("7 - Editar Ordem de Serviço");
 					System.out.println("0 - Sair");
 					System.out.print("Escolha: ");
 					String escolha = teclado.readLine();
@@ -112,6 +115,54 @@ public class ClienteMain {
 
 						}
 					}
+					
+					if (escolha.equals("5")) {
+					    JSONObject ordem = new JSONObject();
+					    ordem.put("operacao", "cadastrar_ordem");
+					    ordem.put("token", token);
+
+					    System.out.print("Descrição da Ordem: ");
+					    ordem.put("descricao", teclado.readLine());
+
+					    out.println(ordem.toJSONString());
+					    System.out.println("JSON enviado ao servidor: " + ordem.toJSONString());
+
+					    String resposta = in.readLine();
+					    System.out.println("JSON recebido do servidor: " + resposta);
+					}
+
+					else if (escolha.equals("6")) {
+					    JSONObject listar = new JSONObject();
+					    listar.put("operacao", "listar_ordens");
+					    listar.put("token", token);
+
+					    System.out.print("Filtro (pendente, finalizada, cancelada ou todas): ");
+					    listar.put("filtro", teclado.readLine());
+
+					    out.println(listar.toJSONString());
+					    System.out.println("JSON enviado ao servidor: " + listar.toJSONString());
+
+					    String resposta = in.readLine();
+					    System.out.println("JSON recebido do servidor: " + resposta);
+					}
+
+					else if (escolha.equals("7")) {
+					    JSONObject editar = new JSONObject();
+					    editar.put("operacao", "editar_ordem");
+					    editar.put("token", token);
+
+					    System.out.print("ID da Ordem: ");
+					    editar.put("id_ordem", Integer.parseInt(teclado.readLine()));
+
+					    System.out.print("Nova descrição: ");
+					    editar.put("nova_descricao", teclado.readLine());
+
+					    out.println(editar.toJSONString());
+					    System.out.println("JSON enviado ao servidor: " + editar.toJSONString());
+
+					    String resposta = in.readLine();
+					    System.out.println("JSON recebido do servidor: " + resposta);
+					}
 
 					else if (escolha.equals("0")) {
 						System.out.println("Encerrando cliente...");
@@ -122,6 +173,7 @@ public class ClienteMain {
 						System.out.println("Opção inválida!");
 					}
 					}else {
+						//tela de adm
 						System.out.println("\n===== MENU ADMINISTRATIVO =====");
 						System.out.println("1 - Logout");
 						System.out.println("2 - Ler meus dados");
@@ -129,6 +181,9 @@ public class ClienteMain {
 						System.out.println("4 - Listar todos os usuários");
 						System.out.println("5 - Editar usuário do sistema");
 						System.out.println("6 - Excluir usuário do sistema");
+						System.out.println("7 - Cadastrar Ordem de Serviço");
+						System.out.println("8 - Listar Ordens de Serviço");
+						System.out.println("9 - Alterar Status da Ordem de Serviço");
 						System.out.println("0 - Sair");
 						System.out.print("Escolha: ");
 						String escolha = teclado.readLine();
@@ -237,7 +292,54 @@ public class ClienteMain {
 							String resposta = in.readLine();
 							System.out.println("JSON recebido do servidor: " + resposta);
 						}
+						
+						if (escolha.equals("7")) {
+						    JSONObject ordem = new JSONObject();
+						    ordem.put("operacao", "cadastrar_ordem");
+						    ordem.put("token", token);
 
+						    System.out.print("Descrição da Ordem: ");
+						    ordem.put("descricao", teclado.readLine());
+
+						    out.println(ordem.toJSONString());
+						    System.out.println("JSON enviado ao servidor: " + ordem.toJSONString());
+
+						    String resposta = in.readLine();
+						    System.out.println("JSON recebido do servidor: " + resposta);
+						}
+						
+						else if (escolha.equals("8")) {
+						    JSONObject listar = new JSONObject();
+						    listar.put("operacao", "listar_ordens");
+						    listar.put("token", token);
+
+						    System.out.print("Filtro (pendente, finalizada, cancelada ou todas): ");
+						    listar.put("filtro", teclado.readLine());
+
+						    out.println(listar.toJSONString());
+						    System.out.println("JSON enviado ao servidor: " + listar.toJSONString());
+
+						    String resposta = in.readLine();
+						    System.out.println("JSON recebido do servidor: " + resposta);
+						}
+						
+						else if (escolha.equals("9")) {
+						    JSONObject alterar = new JSONObject();
+						    alterar.put("operacao", "alterar_ordem");
+						    alterar.put("token", token);
+
+						    System.out.print("ID da ordem a ser alterada: ");
+						    alterar.put("id_ordem", Integer.parseInt(teclado.readLine()));
+
+						    System.out.print("Novo status (finalizada/cancelada): ");
+						    alterar.put("novo_status", teclado.readLine());
+
+						    out.println(alterar.toJSONString());
+						    System.out.println("JSON enviado ao servidor: " + alterar.toJSONString());
+
+						    String resposta = in.readLine();
+						    System.out.println("JSON recebido do servidor: " + resposta);
+						}
 
 						
 						else if (escolha.equals("0")) {
@@ -250,6 +352,7 @@ public class ClienteMain {
 						}
 					}
 				} else {
+					//tela padrão
 					System.out.println("\n===== MENU =====");
 					System.out.println("1 - Cadastrar usuário");
 					System.out.println("2 - Login");
