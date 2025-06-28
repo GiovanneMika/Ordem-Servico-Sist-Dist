@@ -52,13 +52,20 @@ public class OrdemServicoDB {
         return false;
     }
 
-    public static String alterarStatusOrdem(int id, String novoStatus, String perfil) {
+    public static String alterarOrdem(int id, String novoStatus, String novaDescricao, String perfil) {
         if (!"adm".equalsIgnoreCase(perfil)) {
             return "Token inválido";
         }
 
-        if (!"finalizada".equalsIgnoreCase(novoStatus) && !"cancelada".equalsIgnoreCase(novoStatus)) {
+        if (novoStatus == null || 
+            !(novoStatus.equalsIgnoreCase("pendente") || 
+              novoStatus.equalsIgnoreCase("finalizada") || 
+              novoStatus.equalsIgnoreCase("cancelada"))) {
             return "Novo status inválido";
+        }
+
+        if (novaDescricao == null || novaDescricao.trim().length() < 3 || novaDescricao.length() > 150) {
+            return "Descrição inválida";
         }
 
         OrdemServico ordem = buscarPorId(id);
@@ -66,13 +73,11 @@ public class OrdemServicoDB {
             return "Ordem não encontrada";
         }
 
-        if ("finalizada".equalsIgnoreCase(ordem.getStatus()) || "cancelada".equalsIgnoreCase(ordem.getStatus())) {
-            return "Ordem já finalizada/cancelada";
-        }
-
         ordem.setStatus(novoStatus.toLowerCase());
+        ordem.setDescricao(novaDescricao.trim());
         return "sucesso";
     }
+
 
 
     public static OrdemServico buscarPorId(int id) {

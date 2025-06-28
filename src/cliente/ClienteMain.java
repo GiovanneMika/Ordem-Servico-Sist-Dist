@@ -116,7 +116,7 @@ public class ClienteMain {
 						}
 					}
 					
-					if (escolha.equals("5")) {
+					else if (escolha.equals("5")) {
 					    JSONObject ordem = new JSONObject();
 					    ordem.put("operacao", "cadastrar_ordem");
 					    ordem.put("token", token);
@@ -293,7 +293,7 @@ public class ClienteMain {
 							System.out.println("JSON recebido do servidor: " + resposta);
 						}
 						
-						if (escolha.equals("7")) {
+						else if (escolha.equals("7")) {
 						    JSONObject ordem = new JSONObject();
 						    ordem.put("operacao", "cadastrar_ordem");
 						    ordem.put("token", token);
@@ -331,8 +331,11 @@ public class ClienteMain {
 						    System.out.print("ID da ordem a ser alterada: ");
 						    alterar.put("id_ordem", Integer.parseInt(teclado.readLine()));
 
-						    System.out.print("Novo status (finalizada/cancelada): ");
+						    System.out.print("Novo status (pendente/finalizada/cancelada): ");
 						    alterar.put("novo_status", teclado.readLine());
+
+						    System.out.print("Nova descrição: ");
+						    alterar.put("nova_descricao", teclado.readLine());
 
 						    out.println(alterar.toJSONString());
 						    System.out.println("JSON enviado ao servidor: " + alterar.toJSONString());
@@ -340,6 +343,7 @@ public class ClienteMain {
 						    String resposta = in.readLine();
 						    System.out.println("JSON recebido do servidor: " + resposta);
 						}
+
 
 						
 						else if (escolha.equals("0")) {
