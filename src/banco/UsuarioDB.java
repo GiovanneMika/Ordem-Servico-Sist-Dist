@@ -4,6 +4,8 @@ package banco;
 import modelo.Usuario;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -78,6 +80,11 @@ public class UsuarioDB {
 
 	    return lista;
 	}
+	
+	public static Set<String> getUsuariosLogados() {
+	    return new HashSet<>(usuariosLogados);
+	}
+
 
 	
 	

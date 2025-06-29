@@ -17,7 +17,7 @@ public class ServidorMain {
 		while (true) {
 			Socket cliente = serverSocket.accept();
 			System.out.println("Cliente conectado: " + cliente.getInetAddress().getHostAddress());
-			new ServidorThread(cliente).start();
+			//new ServidorThread(cliente).start();
 		}
 	}
 }

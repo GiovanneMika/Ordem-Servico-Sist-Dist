@@ -1,6 +1,7 @@
 package servidor.gui;
 
 import servidor.ServidorThread;
+import banco.UsuarioDB; // Para acesso aos usuários logados, se disponível
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,23 +9,31 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Set;
+import java.util.HashSet;
 
 public class TelaServidorGUI extends JFrame {
     private JTextArea logArea;
+    private JTextArea conexoesArea;
+    private JTextArea usuariosArea;
     private JButton iniciarButton;
     private JButton pararButton;
     private JTextField portaField;
+
     private ServerSocket serverSocket;
     private Thread serverThread;
     private boolean rodando = false;
 
+    private Set<String> ipsConectados = new HashSet<>();
+
     public TelaServidorGUI() {
         setTitle("Servidor - Monitoramento");
-        setSize(500, 400);
+        setSize(700, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // Topo com porta e botões
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Porta:"));
         portaField = new JTextField("12345", 8);
@@ -38,13 +47,24 @@ public class TelaServidorGUI extends JFrame {
         pararButton.setEnabled(false);
         pararButton.addActionListener(this::pararServidor);
         topPanel.add(pararButton);
-
         add(topPanel, BorderLayout.NORTH);
+
+        // Painel principal dividido
+        JTabbedPane abas = new JTabbedPane();
 
         logArea = new JTextArea();
         logArea.setEditable(false);
-        JScrollPane scroll = new JScrollPane(logArea);
-        add(scroll, BorderLayout.CENTER);
+        abas.addTab("Log", new JScrollPane(logArea));
+
+        conexoesArea = new JTextArea();
+        conexoesArea.setEditable(false);
+        abas.addTab("IPs conectados", new JScrollPane(conexoesArea));
+
+        usuariosArea = new JTextArea();
+        usuariosArea.setEditable(false);
+        abas.addTab("Usuários logados", new JScrollPane(usuariosArea));
+
+        add(abas, BorderLayout.CENTER);
     }
 
     private void iniciarServidor(ActionEvent e) {
@@ -68,14 +88,25 @@ public class TelaServidorGUI extends JFrame {
                 try {
                     while (rodando) {
                         Socket cliente = serverSocket.accept();
-                        log("Cliente conectado: " + cliente.getInetAddress().getHostAddress());
-                        new ServidorThread(cliente) {
+                        String ip = cliente.getInetAddress().getHostAddress();
+                        ipsConectados.add(ip);
+                        atualizarConexoes();
+
+                        log("Cliente conectado: " + ip);
+
+                        new ServidorThread(cliente, this::log, this::atualizarUsuariosLogados) {
                             @Override
                             public void run() {
                                 super.run();
-                                log("Thread finalizada para cliente: " + cliente.getInetAddress().getHostAddress());
+                                log("Thread finalizada para cliente: " + ip);
+                                ipsConectados.remove(ip);
+                                atualizarConexoes();
+                                atualizarUsuariosLogados();
                             }
                         }.start();
+
+
+                        atualizarUsuariosLogados();
                     }
                 } catch (IOException ex) {
                     if (rodando) log("Erro no servidor: " + ex.getMessage());
@@ -99,11 +130,34 @@ public class TelaServidorGUI extends JFrame {
             iniciarButton.setEnabled(true);
             pararButton.setEnabled(false);
             portaField.setEnabled(true);
+            ipsConectados.clear();
+            atualizarConexoes();
+            atualizarUsuariosLogados();
         }
     }
 
     private void log(String msg) {
         SwingUtilities.invokeLater(() -> logArea.append(msg + "\n"));
+    }
+
+    private void atualizarConexoes() {
+        SwingUtilities.invokeLater(() -> {
+            conexoesArea.setText("");
+            for (String ip : ipsConectados) {
+                conexoesArea.append(ip + "\n");
+            }
+        });
+    }
+
+    private void atualizarUsuariosLogados() {
+        SwingUtilities.invokeLater(() -> {
+            usuariosArea.setText("");
+
+            // Se tiver controle de sessões em UsuarioDB:
+            for (String usuario : UsuarioDB.getUsuariosLogados()) {
+                usuariosArea.append(usuario + "\n");
+            }
+        });
     }
 
     public static void main(String[] args) {

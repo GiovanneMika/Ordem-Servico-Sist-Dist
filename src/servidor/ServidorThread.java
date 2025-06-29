@@ -9,14 +9,33 @@ import controller.OrdemServicoController;
 
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.function.Consumer;
+
+import javax.swing.SwingUtilities;
+
 import java.io.*;
+
+import java.util.function.Consumer;
 
 public class ServidorThread extends Thread {
     private Socket cliente;
+    private Consumer<String> logger;
+    private Runnable atualizarUsuarios;
 
-    public ServidorThread(Socket socket) {
+    public ServidorThread(Socket socket, Consumer<String> logger, Runnable atualizarUsuarios) {
         this.cliente = socket;
+        this.logger = logger;
+        this.atualizarUsuarios = atualizarUsuarios;
     }
+
+    private void log(String msg) {
+        if (logger != null) logger.accept(msg);
+    }
+
+    private void atualizarUsuariosLogadosGUI() {
+        if (atualizarUsuarios != null) SwingUtilities.invokeLater(atualizarUsuarios);
+    }
+
 
     public void run() {
         try {
@@ -27,7 +46,7 @@ public class ServidorThread extends Thread {
             JSONParser parser = new JSONParser();
 
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("JSON recebido do cliente: " + inputLine);
+                log("JSON recebido do cliente: " + inputLine);
                 try {
                     JSONObject entrada = (JSONObject) parser.parse(inputLine);
                     String operacao = (String) entrada.get("operacao");
@@ -38,58 +57,49 @@ public class ServidorThread extends Thread {
                         case "cadastro":
                             resposta = UsuarioController.realizarCadastro(entrada);
                             break;
-
                         case "login":
                             resposta = UsuarioController.realizarLogin(entrada);
+                            atualizarUsuariosLogadosGUI();
                             break;
 
                         case "logout":
                             resposta = UsuarioController.realizarLogout(entrada);
+                            atualizarUsuariosLogadosGUI();
                             break;
 
                         case "ler_dados":
                             resposta = UsuarioController.realizarLeituraDeDados(entrada);
                             break;
-
                         case "editar_usuario":
                             if (entrada.containsKey("usuario_alvo") && entrada.get("usuario_alvo") != null &&
                                 !((String) entrada.get("usuario_alvo")).isEmpty()) {
                                 resposta = UsuarioController.realizarEdicaoComoAdm(entrada);
                             } else {
-                                resposta = UsuarioController.realizarEdicao(entrada); // edição própria
+                                resposta = UsuarioController.realizarEdicao(entrada);
                             }
                             break;
-
                         case "listar_usuarios":
                             resposta = UsuarioController.realizarListagemDeUsuarios(entrada);
                             break;
-
                         case "excluir_usuario":
                             if (entrada.containsKey("usuario_alvo")) {
                                 resposta = UsuarioController.realizarExclusaoComoAdm(entrada);
                             } else {
-                                resposta = UsuarioController.realizarExclusao(entrada); // exclusão própria
+                                resposta = UsuarioController.realizarExclusao(entrada);
                             }
                             break;
-
-                        // Novas funcionalidades de ordem de serviço
                         case "cadastrar_ordem":
                             resposta = OrdemServicoController.realizarCadastroOrdem(entrada);
                             break;
-
                         case "listar_ordens":
                             resposta = OrdemServicoController.realizarListagemOrdens(entrada);
                             break;
-
                         case "editar_ordem":
                             resposta = OrdemServicoController.realizarEdicaoOrdem(entrada);
                             break;
-                            
                         case "alterar_ordem":
                             resposta = OrdemServicoController.realizarAlteracaoStatusOrdem(entrada);
                             break;
-
-
                         default:
                             resposta = new JSONObject();
                             resposta.put("status", "erro");
@@ -99,22 +109,22 @@ public class ServidorThread extends Thread {
                     }
 
                     out.println(resposta.toJSONString());
-                    System.out.println("JSON enviado ao cliente: " + resposta.toJSONString());
+                    log("JSON enviado ao cliente: " + resposta.toJSONString());
 
                 } catch (ParseException e) {
                     String erro = "{\"status\":\"erro\",\"operacao\":\"desconhecida\",\"mensagem\":\"JSON malformado\"}";
                     out.println(erro);
-                    System.out.println("JSON enviado ao cliente: " + erro);
+                    log("JSON enviado ao cliente: " + erro);
                 }
             }
 
             cliente.close();
         } catch (SocketException e) {
-            System.out.println("Cliente desconectou abruptamente: " + cliente.getInetAddress().getHostAddress());
+            log("Cliente desconectou abruptamente: " + cliente.getInetAddress().getHostAddress());
         } catch (IOException e) {
-            System.err.println("Erro de IO na conexão com o cliente: " + e.getMessage());
+            log("Erro de IO na conexão com o cliente: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Erro inesperado: " + e.getMessage());
+            log("Erro inesperado: " + e.getMessage());
         }
     }
 }
