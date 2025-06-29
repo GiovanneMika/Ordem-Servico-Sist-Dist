@@ -87,16 +87,101 @@ public class PainelUsuarios extends JPanel {
         }
     }
 
-    // Implementar essas depois:
     private void cadastrarUsuario() {
-        // A implementar
+        new DialogCadastroUsuario((Frame) SwingUtilities.getWindowAncestor(this), out, in, token, this::carregarUsuarios).setVisible(true);
     }
+
 
     private void editarUsuario() {
-        // A implementar
+        int linha = tabelaUsuarios.getSelectedRow();
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um usuário para editar.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String usuarioSelecionado = (String) modelo.getValueAt(linha, 0);
+
+        // ADM não pode editar a si mesmo
+        if (usuarioSelecionado.equals(obterUsuarioLogado())) {
+            JOptionPane.showMessageDialog(this, "Você não pode editar a si mesmo.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String nomeAtual = (String) modelo.getValueAt(linha, 1);
+        String perfilAtual = (String) modelo.getValueAt(linha, 2);
+
+        new DialogEditarUsuario(
+                (Frame) SwingUtilities.getWindowAncestor(this),
+                out, in, token,
+                usuarioSelecionado,
+                nomeAtual,
+                perfilAtual,
+                this::carregarUsuarios
+        ).setVisible(true);
     }
 
-    private void excluirUsuario() {
-        // A implementar
+    // Método auxiliar para descobrir quem é o ADM logado (com base nos dados da tabela)
+    private String obterUsuarioLogado() {
+        try {
+            JSONObject req = new JSONObject();
+            req.put("operacao", "ler_dados");
+            req.put("token", token);
+
+            out.println(req.toJSONString());
+            String respStr = in.readLine();
+
+            org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+            JSONObject resp = (JSONObject) parser.parse(respStr);
+            return (String) resp.get("usuario");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ""; // fallback
+        }
     }
+
+
+    private void excluirUsuario() {
+        int linha = tabelaUsuarios.getSelectedRow();
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um usuário para excluir.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String usuarioSelecionado = (String) modelo.getValueAt(linha, 0);
+
+        if (usuarioSelecionado.equals(obterUsuarioLogado())) {
+            JOptionPane.showMessageDialog(this, "Você não pode excluir a si mesmo.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirmar = JOptionPane.showConfirmDialog(this,
+                "Tem certeza que deseja excluir o usuário \"" + usuarioSelecionado + "\"?",
+                "Confirmação",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmar == JOptionPane.YES_OPTION) {
+            try {
+                JSONObject req = new JSONObject();
+                req.put("operacao", "excluir_usuario");
+                req.put("token", token);
+                req.put("usuario_alvo", usuarioSelecionado);
+
+                out.println(req.toJSONString());
+                String resposta = in.readLine();
+
+                if (resposta.contains("\"status\":\"sucesso\"")) {
+                    JOptionPane.showMessageDialog(this, "Usuário excluído com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    carregarUsuarios();
+                } else {
+                    JOptionPane.showMessageDialog(this, resposta, "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Erro ao excluir usuário.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
 }
