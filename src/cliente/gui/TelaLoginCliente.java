@@ -94,9 +94,15 @@ public class TelaLoginCliente extends JFrame {
 	}
 
 	private void abrirMenuInicial(String token, String perfil) {
-		this.dispose();
-		new TelaMenuComumCliente(socket, out, in, token).setVisible(true);
+	    this.dispose();
+
+	    if ("adm".equals(perfil)) {
+	        new TelaMenuAdministradorCliente(socket, out, in, token).setVisible(true);
+	    } else {
+	        new TelaMenuComumCliente(socket, out, in, token).setVisible(true);
+	    }
 	}
+
 
 	private void abrirTelaCadastro(ActionEvent e) {
 		new TelaCadastroCliente(socket, out, in).setVisible(true);
