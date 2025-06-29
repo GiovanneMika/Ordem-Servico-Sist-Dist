@@ -136,14 +136,16 @@ public class TelaServidorGUI extends JFrame {
         } catch (IOException ex) {
             log("Erro ao parar o servidor: " + ex.getMessage());
         } finally {
+            UsuarioDB.limparUsuariosLogados(); // <---- AQUI!
             iniciarButton.setEnabled(true);
             pararButton.setEnabled(false);
             portaField.setEnabled(true);
             ipsConectados.clear();
             atualizarConexoes();
-            atualizarUsuariosLogados();
+            atualizarUsuariosLogados(); // já limpa a área visual
         }
     }
+
 
     private void log(String msg) {
         SwingUtilities.invokeLater(() -> logArea.append(msg + "\n"));

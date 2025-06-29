@@ -67,26 +67,27 @@ public class UsuarioDB {
 			usuarios.put("admin", admin);
 		}
 	}
+
 	public static JSONArray listarTodosUsuarios() {
-	    JSONArray lista = new JSONArray();
+		JSONArray lista = new JSONArray();
 
-	    for (Usuario u : usuarios.values()) {
-	        JSONObject usuarioJson = new JSONObject();
-	        usuarioJson.put("nome", u.getNome());
-	        usuarioJson.put("usuario", u.getUsuario());
-	        usuarioJson.put("perfil", u.getPerfil());
-	        lista.add(usuarioJson);
-	    }
+		for (Usuario u : usuarios.values()) {
+			JSONObject usuarioJson = new JSONObject();
+			usuarioJson.put("nome", u.getNome());
+			usuarioJson.put("usuario", u.getUsuario());
+			usuarioJson.put("perfil", u.getPerfil());
+			lista.add(usuarioJson);
+		}
 
-	    return lista;
+		return lista;
 	}
-	
+
 	public static Set<String> getUsuariosLogados() {
-	    return new HashSet<>(usuariosLogados);
+		return new HashSet<>(usuariosLogados);
 	}
 
-
-	
-	
+	public static void limparUsuariosLogados() {
+		usuariosLogados.clear();
+	}
 
 }
