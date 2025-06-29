@@ -23,6 +23,7 @@ public class TelaServidorGUI extends JFrame {
     private ServerSocket serverSocket;
     private Thread serverThread;
     private boolean rodando = false;
+    private Set<ServidorThread> threadsAtivas = new HashSet<>();
 
     private Set<String> ipsConectados = new HashSet<>();
 
@@ -94,7 +95,7 @@ public class TelaServidorGUI extends JFrame {
 
                         log("Cliente conectado: " + ip);
 
-                        new ServidorThread(cliente, this::log, this::atualizarUsuariosLogados) {
+                        ServidorThread thread = new ServidorThread(cliente, this::log, this::atualizarUsuariosLogados) {
                             @Override
                             public void run() {
                                 super.run();
@@ -102,8 +103,12 @@ public class TelaServidorGUI extends JFrame {
                                 ipsConectados.remove(ip);
                                 atualizarConexoes();
                                 atualizarUsuariosLogados();
+                                threadsAtivas.remove(this); // remove após terminar
                             }
-                        }.start();
+                        };
+
+                        threadsAtivas.add(thread);
+                        thread.start();
 
 
                         atualizarUsuariosLogados();
@@ -123,6 +128,10 @@ public class TelaServidorGUI extends JFrame {
         try {
             rodando = false;
             if (serverSocket != null) serverSocket.close();
+            for (ServidorThread thread : threadsAtivas) {
+                thread.encerrar(); // força encerramento do socket
+            }
+            threadsAtivas.clear();
             log("Servidor parado.");
         } catch (IOException ex) {
             log("Erro ao parar o servidor: " + ex.getMessage());

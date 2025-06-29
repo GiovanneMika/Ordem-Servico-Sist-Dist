@@ -35,6 +35,18 @@ public class ServidorThread extends Thread {
     private void atualizarUsuariosLogadosGUI() {
         if (atualizarUsuarios != null) SwingUtilities.invokeLater(atualizarUsuarios);
     }
+    
+    private volatile boolean encerrado = false;
+
+    public void encerrar() {
+        encerrado = true;
+        try {
+            cliente.close(); // força encerramento
+        } catch (IOException e) {
+            log("Erro ao encerrar conexão com cliente: " + e.getMessage());
+        }
+    }
+
 
 
     public void run() {
@@ -45,7 +57,7 @@ public class ServidorThread extends Thread {
             String inputLine;
             JSONParser parser = new JSONParser();
 
-            while ((inputLine = in.readLine()) != null) {
+            while (!encerrado && (inputLine = in.readLine()) != null) {
                 log("JSON recebido do cliente: " + inputLine);
                 try {
                     JSONObject entrada = (JSONObject) parser.parse(inputLine);
