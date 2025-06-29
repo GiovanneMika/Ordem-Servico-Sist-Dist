@@ -124,9 +124,19 @@ public class TelaEditarUsuarioCliente extends JFrame {
 
             if ("sucesso".equals(obj.get("status"))) {
                 JOptionPane.showMessageDialog(this, "Informações atualizadas com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                token = (String) obj.get("token"); // Atualiza o token se foi renovado
-                telaAnterior.atualizarToken(token); // Atualiza no menu principal também
-                this.dispose();
+                String novoToken = (String) obj.get("token");
+                System.out.println("Novo token recebido: " + novoToken);
+
+                // Fecha a tela de menu atual
+                telaAnterior.dispose();
+
+                // Abre uma nova instância com o novo token
+                SwingUtilities.invokeLater(() -> {
+                    new TelaMenuComumCliente(socket, out, in, novoToken).setVisible(true);
+                });
+
+                this.dispose(); // Fecha a tela de edição
+
             } else {
                 JOptionPane.showMessageDialog(this, obj.get("mensagem"), "Erro ao atualizar", JOptionPane.ERROR_MESSAGE);
             }
