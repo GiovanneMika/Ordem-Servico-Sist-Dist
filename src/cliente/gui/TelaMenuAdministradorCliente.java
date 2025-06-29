@@ -30,7 +30,7 @@ public class TelaMenuAdministradorCliente extends JFrame {
         abas = new JTabbedPane();
 
         abas.addTab("Usuários", new PainelUsuarios(socket, out, in, token));
-       // abas.addTab("Ordens de Serviço", new PainelOrdensAdm(socket, out, in, token));
+        abas.addTab("Ordens de Serviço", new PainelOrdensAdm(socket, out, in, token));
 
         add(abas, BorderLayout.CENTER);
     }
