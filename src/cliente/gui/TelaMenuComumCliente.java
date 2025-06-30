@@ -92,9 +92,12 @@ public class TelaMenuComumCliente extends JFrame {
 			requisicao.put("token", token);
 			requisicao.put("filtro", filtro);  // usa filtro vindo da combo
 
-			out.println(requisicao.toJSONString());
+			String jsonEnviado = requisicao.toJSONString();
+			System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+			out.println(jsonEnviado);
 
 			String respostaStr = in.readLine();
+			System.out.println("JSON recebido do servidor: " + respostaStr);
 			JSONParser parser = new JSONParser();
 			JSONObject resposta = (JSONObject) parser.parse(respostaStr);
 
@@ -132,9 +135,12 @@ public class TelaMenuComumCliente extends JFrame {
 				novaOrdem.put("token", token);
 				novaOrdem.put("descricao", descricao);
 
-				out.println(novaOrdem.toJSONString());
+				String jsonEnviado = novaOrdem.toJSONString();
+				System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+				out.println(jsonEnviado);
 
 				String resposta = in.readLine();
+				System.out.println("JSON recebido do servidor: " + resposta);
 				JSONParser parser = new JSONParser();
 				JSONObject obj = (JSONObject) parser.parse(resposta);
 
@@ -178,9 +184,12 @@ public class TelaMenuComumCliente extends JFrame {
 				editar.put("id_ordem", Long.valueOf(idObj.toString())); // ou Integer.parseInt
 				editar.put("nova_descricao", novaDescricao);
 
-				out.println(editar.toJSONString());
+				String jsonEnviado = editar.toJSONString();
+				System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+				out.println(jsonEnviado);
 
 				String resposta = in.readLine();
+				System.out.println("JSON recebido do servidor: " + resposta);
 				JSONParser parser = new JSONParser();
 				JSONObject obj = (JSONObject) parser.parse(resposta);
 
@@ -207,9 +216,12 @@ public class TelaMenuComumCliente extends JFrame {
 			logout.put("operacao", "logout");
 			logout.put("token", token);
 
-			out.println(logout.toJSONString());
+			String jsonEnviado = logout.toJSONString();
+			System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+			out.println(jsonEnviado);
 
 			String resposta = in.readLine();
+			System.out.println("JSON recebido do servidor: " + resposta);
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(resposta);
 
@@ -245,9 +257,12 @@ public class TelaMenuComumCliente extends JFrame {
 				excluir.put("operacao", "excluir_usuario");
 				excluir.put("token", token);
 
-				out.println(excluir.toJSONString());
+				String jsonEnviado = excluir.toJSONString();
+				System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+				out.println(jsonEnviado);
 
 				String resposta = in.readLine();
+				System.out.println("JSON recebido do servidor: " + resposta);
 				JSONParser parser = new JSONParser();
 				JSONObject obj = (JSONObject) parser.parse(resposta);
 

@@ -72,8 +72,13 @@ public class DialogCadastroUsuario extends JDialog {
             req.put("perfil", perfil);
             req.put("token", token);
 
-            out.println(req.toJSONString());
+            String jsonEnviado = req.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
+
             String resposta = in.readLine();
+            System.out.println("JSON recebido do servidor: " + resposta);
+
 
             if (resposta.contains("\"status\":\"sucesso\"")) {
                 JOptionPane.showMessageDialog(this, "Usuário cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

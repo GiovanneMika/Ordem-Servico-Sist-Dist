@@ -70,8 +70,13 @@ public class DialogEditarUsuario extends JDialog {
             req.put("nova_senha", novaSenha);
             req.put("novo_perfil", novoPerfil);
 
-            out.println(req.toJSONString());
+            String jsonEnviado = req.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
+
             String resposta = in.readLine();
+            System.out.println("JSON recebido do servidor: " + resposta);
+
 
             if (resposta.contains("\"status\":\"sucesso\"")) {
                 JOptionPane.showMessageDialog(this, "Usuário editado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

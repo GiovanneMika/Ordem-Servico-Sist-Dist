@@ -77,9 +77,13 @@ public class TelaCadastroCliente extends JFrame {
             cadastro.put("senha", senha);
             cadastro.put("perfil", "comum");
 
-            out.println(cadastro.toJSONString());
+            String jsonEnviado = cadastro.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
 
             String resposta = in.readLine();
+            System.out.println("JSON recebido do servidor: " + resposta);
+
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(resposta);
 

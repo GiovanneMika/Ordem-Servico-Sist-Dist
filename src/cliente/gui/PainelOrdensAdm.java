@@ -77,9 +77,12 @@ public class PainelOrdensAdm extends JPanel {
 			logout.put("operacao", "logout");
 			logout.put("token", token);
 
-			out.println(logout.toJSONString());
+			String jsonEnviado = logout.toJSONString();
+			System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+			out.println(jsonEnviado);
 
 			String resposta = in.readLine();
+			System.out.println("JSON recebido do servidor: " + resposta);
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(resposta);
 
@@ -113,9 +116,13 @@ public class PainelOrdensAdm extends JPanel {
 				novaOrdem.put("token", token);
 				novaOrdem.put("descricao", descricao);
 
-				out.println(novaOrdem.toJSONString());
+				String jsonEnviado = novaOrdem.toJSONString();
+				System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+				out.println(jsonEnviado);
 
 				String resposta = in.readLine();
+				System.out.println("JSON recebido do servidor: " + resposta);
+
 				JSONParser parser = new JSONParser();
 				JSONObject obj = (JSONObject) parser.parse(resposta);
 
@@ -169,9 +176,13 @@ public class PainelOrdensAdm extends JPanel {
 			editar.put("nova_descricao", novaDescricao);
 			editar.put("novo_status", novoStatus);
 
-			out.println(editar.toJSONString());
+			String jsonEnviado = editar.toJSONString();
+			System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+			out.println(jsonEnviado);
 
 			String resposta = in.readLine();
+			System.out.println("JSON recebido do servidor: " + resposta);
+
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(resposta);
 
@@ -197,9 +208,13 @@ public class PainelOrdensAdm extends JPanel {
 			requisicao.put("token", token);
 			requisicao.put("filtro", filtro);
 
-			out.println(requisicao.toJSONString());
+			String jsonEnviado = requisicao.toJSONString();
+			System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+			out.println(jsonEnviado);
 
 			String respostaStr = in.readLine();
+			System.out.println("JSON recebido do servidor: " + respostaStr);
+
 			JSONParser parser = new JSONParser();
 			JSONObject resposta = (JSONObject) parser.parse(respostaStr);
 

@@ -60,8 +60,13 @@ public class PainelUsuarios extends JPanel {
             req.put("operacao", "listar_usuarios");
             req.put("token", token);
 
-            out.println(req.toJSONString());
+            String jsonEnviado = req.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
+
             String respStr = in.readLine();
+            System.out.println("JSON recebido do servidor: " + respStr);
+
 
             JSONParser parser = new JSONParser();
             JSONObject resposta = (JSONObject) parser.parse(respStr);
@@ -127,8 +132,13 @@ public class PainelUsuarios extends JPanel {
             req.put("operacao", "ler_dados");
             req.put("token", token);
 
-            out.println(req.toJSONString());
+            String jsonEnviado = req.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
+
             String respStr = in.readLine();
+            System.out.println("JSON recebido do servidor: " + respStr);
+
 
             org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
             JSONObject resp = (JSONObject) parser.parse(respStr);
@@ -167,8 +177,13 @@ public class PainelUsuarios extends JPanel {
                 req.put("token", token);
                 req.put("usuario_alvo", usuarioSelecionado);
 
-                out.println(req.toJSONString());
+                String jsonEnviado = req.toJSONString();
+                System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+                out.println(jsonEnviado);
+
                 String resposta = in.readLine();
+                System.out.println("JSON recebido do servidor: " + resposta);
+
 
                 if (resposta.contains("\"status\":\"sucesso\"")) {
                     JOptionPane.showMessageDialog(this, "Usuário excluído com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

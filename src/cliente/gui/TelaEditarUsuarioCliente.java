@@ -70,9 +70,13 @@ public class TelaEditarUsuarioCliente extends JFrame {
             requisicao.put("operacao", "ler_dados");
             requisicao.put("token", token);
 
-            out.println(requisicao.toJSONString());
+            String jsonEnviado = requisicao.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
 
             String resposta = in.readLine();
+            System.out.println("JSON recebido do servidor: " + resposta);
+
             System.out.println("Resposta ler_dados: " + resposta);
 
             JSONParser parser = new JSONParser();
@@ -116,9 +120,13 @@ public class TelaEditarUsuarioCliente extends JFrame {
             editar.put("novo_usuario", usuario);
             editar.put("nova_senha", senha);
 
-            out.println(editar.toJSONString());
+            String jsonEnviado = editar.toJSONString();
+            System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+            out.println(jsonEnviado);
 
             String resposta = in.readLine();
+            System.out.println("JSON recebido do servidor: " + resposta);
+
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(resposta);
 

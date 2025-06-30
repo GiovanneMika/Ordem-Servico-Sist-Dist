@@ -69,11 +69,15 @@ public class TelaLoginCliente extends JFrame {
 			login.put("usuario", usuario);
 			login.put("senha", senha);
 
-			out.println(login.toJSONString());
+			String jsonEnviado = login.toJSONString();
+			System.out.println("JSON enviado ao servidor: " + jsonEnviado);
+			out.println(jsonEnviado);
 
 			String resposta = in.readLine();
+			System.out.println("JSON recebido do servidor: " + resposta);
 			JSONParser parser = new JSONParser();
 			JSONObject obj = (JSONObject) parser.parse(resposta);
+
 
 			if ("sucesso".equals(obj.get("status"))) {
 				String token = (String) obj.get("token");
