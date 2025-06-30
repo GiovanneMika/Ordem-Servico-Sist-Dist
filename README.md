@@ -1,6 +1,8 @@
 # 📡 Sistema Cliente-Servidor em Java (JSON via TCP/IP)
 
-Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comunicação via sockets TCP/IP utilizando mensagens em formato **JSON**. O sistema permite cadastro, login, autenticação via token e funcionalidades específicas para usuários comuns e administradores.
+Este projeto é uma aplicação **cliente-servidor** desenvolvida em Java, com comunicação via **sockets TCP/IP** utilizando mensagens em formato **JSON**. A aplicação suporta múltiplos usuários com perfis distintos (**comum** e **administrador**) e conta com uma **interface gráfica completa (Swing)** para **cliente e servidor**, além de funcionalidades de **ordens de serviço** e gerenciamento de usuários.
+
+---
 
 ## 🗂️ Estrutura do Projeto
 
@@ -8,14 +10,23 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
 ├── banco/
 │   └── UsuarioDB.java
 ├── cliente/
-│   └── ClienteMain.java
+│   ├── ClienteMain.java
+│   └── gui/
+│       ├── TelaLoginCliente.java
+│       ├── TelaMenuComumCliente.java
+│       ├── TelaEditarUsuarioCliente.java
+│       ├── TelaMenuAdministrador.java
+│       ├── PainelUsuariosAdm.java
+│       └── PainelOrdensAdm.java
+├── servidor/
+│   ├── ServidorMain.java
+│   ├── ServidorThread.java
+│   └── gui/
+│       └── TelaServidorGUI.java
 ├── controller/
 │   └── UsuarioController.java
 ├── modelo/
 │   └── Usuario.java
-├── servidor/
-│   ├── ServidorMain.java
-│   └── ServidorThread.java
 ├── utils/
 │   └── Validador.java
 ```
@@ -24,20 +35,36 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
 
 ## ✅ Funcionalidades
 
-### 👤 Usuário Comum
+### 👤 Usuário Comum (com interface gráfica)
 
 * Login e logout
-* Leitura dos próprios dados
-* Edição dos próprios dados (nome, usuário, senha)
-* Exclusão da própria conta
+* Leitura e edição dos próprios dados (nome, usuário, senha)
+* **Autoexclusão da conta**, com retorno à tela de login
+* Cadastro e edição de **ordens de serviço**
+* **Filtro de ordens** por status: `todas`, `pendente`, `finalizada`, `cancelada`
+* Visualização apenas das **ordens do próprio usuário**
 
-### 🛠️ Administrador
+---
+
+### 🛠️ Administrador (com interface gráfica)
 
 * Todas as funções do usuário comum
-* Cadastro de novos usuários (comum ou admin)
-* Listagem de todos os usuários do sistema
-* Edição de qualquer usuário do sistema (inclusive troca de perfil)
-* Exclusão de qualquer usuário do sistema
+* Cadastro de usuários com qualquer perfil (`comum` ou `adm`)
+* Listagem, edição (nome, senha, perfil) e exclusão de **qualquer usuário**
+* Listagem e edição de **todas as ordens de serviço**
+* Filtro por status de ordens (igual ao comum)
+* Interface dividida em **abas**: *Usuários* e *Ordens de Serviço*
+
+---
+
+### 💡 Servidor (com interface gráfica)
+
+* Escolha da porta e inicialização do servidor
+* Botão para encerrar servidor com segurança
+* Aba **Log** com todas as atividades registradas
+* Aba de **IPs conectados** em tempo real
+* Aba de **usuários logados** (sessões ativas)
+* Encerramento automático das conexões ao parar o servidor
 
 ---
 
@@ -45,130 +72,98 @@ Este projeto é uma aplicação cliente-servidor desenvolvida em Java com comuni
 
 * Java 11 ou superior
 * Biblioteca [JSON Simple v1.1.1](https://code.google.com/archive/p/json-simple/) (já importada no projeto)
-* IDE ou terminal com compilador `javac`
+* IDE com suporte a Swing (Eclipse, IntelliJ, NetBeans)
 
 ---
 
-## 🖥️ Como executar o Servidor
+## 🖥️ Como Executar
 
-1. Navegue até a pasta raiz do projeto.
+### 🔁 Servidor com GUI
 
-2. Compile os arquivos Java:
+1. Compile:
 
-   ```bash
-   javac servidor/ServidorMain.java servidor/ServidorThread.java controller/UsuarioController.java banco/UsuarioDB.java modelo/Usuario.java utils/Validador.java
-   ```
+```bash
+javac servidor/*.java servidor/gui/*.java controller/*.java banco/*.java modelo/*.java utils/*.java
+```
 
-3. Execute o servidor:
+2. Execute:
 
-   ```bash
-   java servidor.ServidorMain
-   ```
+```bash
+java servidor.gui.TelaServidorGUI
+```
 
-4. Informe a porta desejada quando solicitado (exemplo: `12345`).
-
-   A seguinte mensagem será exibida:
-
-   ```
-   Servidor rodando na porta 12345
-   ```
+3. Digite a porta desejada (ex: `12345`) e clique em **Iniciar Servidor**.
 
 ---
 
-## 💻 Como executar o Cliente
+### 👨‍💻 Cliente com Interface Gráfica
 
-1. Em outro terminal (ou máquina), compile o cliente:
+1. Compile:
 
-   ```bash
-   javac cliente/ClienteMain.java
-   ```
+```bash
+javac cliente/gui/*.java cliente/ClienteMain.java
+```
 
-2. Execute o cliente:
+2. Execute:
 
-   ```bash
-   java cliente.ClienteMain
-   ```
+```bash
+java cliente.gui.TelaLoginCliente
+```
 
-3. Informe o IP do servidor (ex: `127.0.0.1`) e a porta usada no servidor.
+3. Informe IP e porta do servidor e realize o login.
+
+---
+
+### 📟 Cliente Terminal (opcional / legado)
+
+1. Compile:
+
+```bash
+javac cliente/ClienteMain.java
+```
+
+2. Execute:
+
+```bash
+java cliente.ClienteMain
+```
 
 ---
 
 ## 📦 Exemplos de Uso
 
-### Após o login:
-
-#### Usuário comum verá o menu:
-
-```
-===== MENU =====
-1 - Logout
-2 - Ler meus dados
-3 - Editar meus dados
-4 - Excluir minha conta
-0 - Sair
-```
-
-#### Usuário administrador verá o menu:
-
-```
-===== MENU ADMINISTRATIVO =====
-1 - Logout
-2 - Ler meus dados
-3 - Cadastrar novo usuário
-4 - Listar todos os usuários
-5 - Editar usuário do sistema
-6 - Excluir usuário do sistema
-0 - Sair
-```
-
----
-
-## 🛡️ Autenticação
-
-Após login bem-sucedido, o servidor retorna um **token de autenticação** e o **perfil** do usuário (`comum` ou `adm`). Esse token deve ser incluído em todas as requisições subsequentes que exigem autenticação.
-
----
-
-## 📁 Observações
-
-* Os dados são mantidos **em memória**, portanto **serão perdidos** ao reiniciar o servidor.
-* O sistema suporta múltiplos clientes simultaneamente via **threads**.
-* Um usuário só pode estar **logado em uma sessão por vez**.
-* As operações administrativas são permitidas **somente a usuários com perfil `adm`**.
-
----
-
-## 🧪 Exemplo de JSONs trocados
-
-### Cadastro (pelo admin):
+### Autoexclusão do Usuário Comum (JSON enviado)
 
 ```json
 {
-  "operacao": "cadastro",
-  "nome": "João",
-  "usuario": "joao123",
-  "senha": "1234",
-  "perfil": "comum",
-  "token": "TOKEN_DO_ADMIN"
+  "operacao": "excluir_usuario",
+  "token": "TOKEN_DO_USUARIO"
 }
 ```
 
-### Edição de outro usuário (admin):
+### Listagem de Ordens Filtradas
 
 ```json
 {
-  "operacao": "editar_usuario",
-  "usuario_alvo": "joao123",
-  "novo_nome": "João Silva",
-  "nova_senha": "novaSenha",
-  "novo_perfil": "adm",
-  "token": "TOKEN_DO_ADMIN"
+  "operacao": "listar_ordens",
+  "token": "TOKEN_VALIDO",
+  "filtro": "pendente"
 }
 ```
 
 ---
 
-## 👨‍💻 Desenvolvido por
+## 🧠 Observações Técnicas
 
-Discente **Giovanne Ribeiro Mika** para projeto acadêmico da disciplina de **Sistemas Distribuídos**.
+* Todos os dados são mantidos **em memória** (sem persistência em banco de dados).
+* A aplicação é **multithreaded**: cada cliente conectado roda em sua própria `ServidorThread`.
+* O controle de sessões permite **um único login por usuário**.
+* Tokens de autenticação são obrigatórios para qualquer operação pós-login.
+* O servidor gráfico remove automaticamente usuários logados e IPs ao desconectar ou parar.
 
+---
+
+## 🧑‍💻 Desenvolvido por
+
+**Giovanne Ribeiro Mika**
+Projeto acadêmico da disciplina de **Sistemas Distribuídos**
