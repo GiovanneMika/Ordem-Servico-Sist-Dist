@@ -34,6 +34,17 @@ public class TelaMenuComumCliente extends JFrame {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
+        JPanel topoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JComboBox<String> filtroCombo = new JComboBox<>(new String[]{"todas", "pendente", "finalizada", "cancelada"});
+        JButton atualizarButton = new JButton("Atualizar");
+
+        atualizarButton.addActionListener(e -> carregarOrdens((String) filtroCombo.getSelectedItem()));
+
+        topoPanel.add(new JLabel("Filtro:"));
+        topoPanel.add(filtroCombo);
+        topoPanel.add(atualizarButton);
+
+        add(topoPanel, BorderLayout.NORTH);
 
 		modeloTabela = new DefaultTableModel(new Object[] { "ID", "Descrição", "Status" }, 0) {
 			public boolean isCellEditable(int row, int column) {
@@ -62,19 +73,24 @@ public class TelaMenuComumCliente extends JFrame {
 
 		add(botoesPanel, BorderLayout.SOUTH);
 
-		carregarOrdens();
+		carregarOrdens("todas");
+		
+		JButton excluirContaButton = new JButton("Excluir Minha Conta");
+		excluirContaButton.addActionListener(this::excluirMinhaConta);
+		botoesPanel.add(excluirContaButton);
+
 		JButton logoutButton = new JButton("Logout");
 		logoutButton.addActionListener(this::realizarLogout);
 		botoesPanel.add(logoutButton);
 
 	}
 
-	private void carregarOrdens() {
+	private void carregarOrdens(String filtro) {
 		try {
 			JSONObject requisicao = new JSONObject();
 			requisicao.put("operacao", "listar_ordens");
 			requisicao.put("token", token);
-			requisicao.put("filtro", "todas");
+			requisicao.put("filtro", filtro);  // usa filtro vindo da combo
 
 			out.println(requisicao.toJSONString());
 
@@ -88,7 +104,11 @@ public class TelaMenuComumCliente extends JFrame {
 				JSONArray ordens = (JSONArray) resposta.get("ordens");
 				for (Object o : ordens) {
 					JSONObject ordem = (JSONObject) o;
-					modeloTabela.addRow(new Object[] { ordem.get("id"), ordem.get("descricao"), ordem.get("status") });
+					modeloTabela.addRow(new Object[] {
+						ordem.get("id"),
+						ordem.get("descricao"),
+						ordem.get("status")
+					});
 				}
 			} else {
 				JOptionPane.showMessageDialog(this, resposta.get("mensagem"), "Erro ao carregar ordens",
@@ -100,6 +120,7 @@ public class TelaMenuComumCliente extends JFrame {
 			ex.printStackTrace();
 		}
 	}
+
 
 	private void abrirCadastroOrdem(ActionEvent e) {
 		String descricao = JOptionPane.showInputDialog(this, "Digite a descrição da nova ordem:");
@@ -120,7 +141,7 @@ public class TelaMenuComumCliente extends JFrame {
 				if ("sucesso".equals(obj.get("status"))) {
 					JOptionPane.showMessageDialog(this, "Ordem cadastrada com sucesso!", "Sucesso",
 							JOptionPane.INFORMATION_MESSAGE);
-					carregarOrdens();
+					carregarOrdens("todas");
 				} else {
 					JOptionPane.showMessageDialog(this, obj.get("mensagem"), "Erro ao cadastrar",
 							JOptionPane.ERROR_MESSAGE);
@@ -166,7 +187,7 @@ public class TelaMenuComumCliente extends JFrame {
 				if ("sucesso".equals(obj.get("status"))) {
 					JOptionPane.showMessageDialog(this, "Ordem editada com sucesso!", "Sucesso",
 							JOptionPane.INFORMATION_MESSAGE);
-					carregarOrdens();
+					carregarOrdens("todas");
 				} else {
 					JOptionPane.showMessageDialog(this, obj.get("mensagem"), "Erro ao editar ordem",
 							JOptionPane.ERROR_MESSAGE);
@@ -212,5 +233,46 @@ public class TelaMenuComumCliente extends JFrame {
 			ex.printStackTrace();
 		}
 	}
+	
+	private void excluirMinhaConta(ActionEvent e) {
+		int confirmacao = JOptionPane.showConfirmDialog(this,
+				"Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.",
+				"Confirmação", JOptionPane.YES_NO_OPTION);
+
+		if (confirmacao == JOptionPane.YES_OPTION) {
+			try {
+				JSONObject excluir = new JSONObject();
+				excluir.put("operacao", "excluir_usuario");
+				excluir.put("token", token);
+
+				out.println(excluir.toJSONString());
+
+				String resposta = in.readLine();
+				JSONParser parser = new JSONParser();
+				JSONObject obj = (JSONObject) parser.parse(resposta);
+
+				if ("sucesso".equals(obj.get("status"))) {
+					JOptionPane.showMessageDialog(this,
+							"Conta excluída com sucesso. Você será redirecionado para a tela de login.",
+							"Conta excluída", JOptionPane.INFORMATION_MESSAGE);
+					this.dispose(); // Fecha a tela atual
+
+					// Redireciona para login
+					SwingUtilities.invokeLater(() -> {
+						new TelaLoginCliente(socket, out, in).setVisible(true);
+					});
+				} else {
+					JOptionPane.showMessageDialog(this, obj.get("mensagem"),
+							"Erro ao excluir conta", JOptionPane.ERROR_MESSAGE);
+				}
+
+			} catch (IOException | ParseException ex) {
+				JOptionPane.showMessageDialog(this, "Erro ao comunicar com o servidor.",
+						"Erro", JOptionPane.ERROR_MESSAGE);
+				ex.printStackTrace();
+			}
+		}
+	}
+
 
 }
