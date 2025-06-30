@@ -37,7 +37,7 @@ public class TelaServidorGUI extends JFrame {
         // Topo com porta e botões
         JPanel topPanel = new JPanel();
         topPanel.add(new JLabel("Porta:"));
-        portaField = new JTextField("12345", 8);
+        portaField = new JTextField("24000", 8);
         topPanel.add(portaField);
 
         iniciarButton = new JButton("Iniciar Servidor");
